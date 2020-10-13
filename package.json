@@ -1,0 +1,44 @@
+{
+  "name": "red-contrib-sunshine-conversation",
+  "version": "0.0.1",
+  "description": "Send mensage using sunshine conversation API",
+  "dependencies": {
+    "cli-color": "^1.4.0",
+    "moment": "^2.22.2",
+    "node-pre-gyp": "^0.12.0",
+    "pb-util": "^0.1.0",
+    "prettyjson": "^1.2.1",
+    "request": "^2.88.0",
+    "underscore": "^1.9.1"
+  },
+  "keywords": [
+    "node-red",
+    "api",
+    "chatbot",
+    "sunshine conversation"
+  ],
+  "node-red": {
+    "nodes": {
+      "sunshine": "sunshine.js",
+      "options": "options.js"
+    }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cleiton Jorge (ceujorge)",
+  "license": "ISC",
+  "main": "options.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ceujorge/node-red-metasix-smooch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ceujorge/node-red-metasix-smooch/issues"
+  },
+  "homepage": "https://github.com/ceujorge/node-red-metasix-smooch#readme"
+}

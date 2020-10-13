@@ -1,0 +1,7 @@
+{
+    "options" : {
+        "name": "Nome",
+        "message2": "This is my second message",
+        "checkall":"checking all rules"
+    }
+}
