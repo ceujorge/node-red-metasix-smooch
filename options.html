@@ -22,7 +22,7 @@
   </div>
   <div class="form-row">
     <label for="node-input-question"><i class="fa fa-tag"></i> <span data-i18n="common.label.question">Question</span></label>
-    <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-question"></div>
+    <div style="height: 100px; min-height:50px;" class="node-text-editor" id="node-input-question"></div>
   </div>
   <div class="form-row">
       <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.property">Property</span></label>
@@ -147,9 +147,6 @@
             mode: 'ace/mode/text',
             value: this.question
           });
-
-          //this.editor.setNewLineMode("auto");
-          //this.editor.setUseSoftTabs(true);
 
           function resizeRule(rule) {
               var newWidth = rule.width();

@@ -52,7 +52,6 @@
 </div>
 </script>
 
-
 <script type="text/html" data-template-name="Send">
   <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name">Name</span></label>
@@ -63,8 +62,32 @@
       <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
   </div>
   <div class="form-row">
+    <label for="node-input-postmessage"><i class="fa fa-tag"></i> <span data-i18n="common.label.postmessage">Message</span></label>
+    <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-postmessage"></div>
+  </div>
+  <div class="form-row" id="delay-details-for">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span data-i18n="delay.for">Delay</span></label>
+    <input type="text" id="node-input-timeout" style="text-align:end; width:90px !important">
+    <select id="node-input-timeoutUnits" style="width:200px !important">
+      <option value="disabled" data-i18n="delay.disabled">disabled</option>
+      <option value="milliseconds" data-i18n="delay.milisecs">milliseconds</option>
+      <option value="seconds" data-i18n="delay.secs">seconds</option>
+      <option value="minutes" data-i18n="delay.mins">minutes</option>
+      <option value="hours" data-i18n="delay.hours">hours</option>
+      <option value="days" data-i18n="delay.days">days</option>
+    </select>
+  </div>
+  <div class="form-row">
       <input type="checkbox" id="node-input-debug" style="display: inline-block; width: auto; vertical-align: top;">
       <label for="node-input-debug" style="width: auto"><span>Debug print?</span></label>
+  </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-returnquestion" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-returnquestion" style="width: auto"><span>Change the status of the user context to return the question (used in invalid options)</span></label>
+  </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-clearuser" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-clearuser" style="width: auto"><span>Clearing context flow user variable? (use to complete flow)</span></label>
   </div>
 </script>
 
@@ -101,17 +124,56 @@
       color:"#DEB887",
       defaults: {
           name: {value:""},
+          postmessage: {value:""},
+          timeout: {value:"5", required:true},
+          timeoutUnits: {value:"Disabled"},
           smooch:{value:"", type:"smooch"},
           debug: {value: false},
+          returnquestion: {value: false},
+          clearuser: {value: false}
       },
       inputs:1,
       //outputs:1,
       icon: "smooch.svg",
       label: function() {
+        if (this.name) {
           return this.name || "Send";
+        }
+        if(this.timeoutUnits)
+        {
+          var units = this.timeoutUnits ? this.timeoutUnits.charAt(0) : "s";
+          if (this.timeoutUnits == "milliseconds") { units = "ms"; }
+          return this._("delay.label.delay")+" "+this.timeout+units;
+        }
       },
       labelStyle: function() {
           return this.name?"node_label_italic":"";
+      },
+      oneditprepare: function() {
+          var node = this;
+          $( "#node-input-timeout" ).spinner({min:1});
+          this.editor = RED.editor.createEditor({
+            id: 'node-input-postmessage',
+            mode: 'ace/mode/text',
+            value: this.postmessage,
+          });
+          if (!this.timeoutUnits) {
+              $("#node-input-timeoutUnits option").filter(function() {
+                  return $(this).val() == 'seconds';
+              }).attr('selected', true);
+          }
+        },
+      oneditsave: function() {
+
+          this.postmessage = this.editor.getValue();
+          var val = this.editor.getValue();
+          this.editor.destroy();
+          delete this.editor;
+          $("#node-input-postmessage").val(val);
+      },
+      oneditcancel: function() {
+          this.editor.destroy();
+          delete this.editor;
       }
   });
 </script>

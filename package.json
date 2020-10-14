@@ -1,6 +1,6 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
     "cli-color": "^1.4.0",
@@ -31,7 +31,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Cleiton Jorge (ceujorge)",
-  "license": "ISC",
+  "license": "GPL-2.0-only",
   "main": "options.js",
   "repository": {
     "type": "git",

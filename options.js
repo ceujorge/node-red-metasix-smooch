@@ -234,12 +234,19 @@ module.exports = function(RED) {
     })[0];
   }
 
+  function sendDebug(msg) {
+    // don't put blank errors in sidebar (but do add to logs)
+    //if ((msg.msg === "") && (msg.hasOwnProperty("level")) && (msg.level === 20)) { return; }
+    msg = RED.util.encodeObject(msg, {maxLength:1000});
+    RED.comms.publish("debug",msg);
+  }
+
   var request = require('request');
 
   function sendMessage(msg, node){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
-    var debug = false;//utils.extractValue('boolean', 'debug', node, msg, false);
+    var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
 
     // exit if empty credentials
     if (smoochNode == null || smoochNode.credentials == null) {
@@ -308,7 +315,7 @@ module.exports = function(RED) {
           node.error(error, msg);
           msg.payload = error.toString() + " : " + inputUrl;
           msg.statusCode = error.code;
-          node.send(msg);
+          //node.send(msg);
           node.status({
             fill: "red",
             shape: "ring",
@@ -335,7 +342,7 @@ module.exports = function(RED) {
         if(debug)
           sendDebug({id:node.id, z:node.z, _alias: node._alias,  path:node._flow.path, name:node.name, topic:msg.topic, msg:msg});
 
-        node.send(msg);
+        //node.send(msg);
       }
     });
   }
@@ -348,7 +355,7 @@ module.exports = function(RED) {
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
       this.name = n.name;
-      node.question = n.question;
+      this.question = n.question;
 
       this.checkall = n.checkall || "true";
       this.previousValue = null;
@@ -358,7 +365,7 @@ module.exports = function(RED) {
       var name = n.name;
       var question = n.question;
 
-      //Variavel usada para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
+      //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
       var contextQuestion = this.context().flow;
 
       if (this.propertyType === 'jsonata') {
@@ -663,6 +670,7 @@ module.exports = function(RED) {
       }
 
       this.on('input', function(msg) {
+          msg.nodename = name;
           processMessageQueue(msg);
       });
 
