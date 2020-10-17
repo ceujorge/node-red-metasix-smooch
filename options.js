@@ -190,6 +190,7 @@ module.exports = function(RED) {
                   state.elseflag = true;
               }
               if (operators[rule.t](property,v1,v2,rule.case,msg.parts)) {
+                  msg.userret = rule.ret;
                   state.onward.push(msg);
                   state.elseflag = false;
                   if (node.checkall == "false") {
@@ -234,6 +235,14 @@ module.exports = function(RED) {
     })[0];
   }
 
+  function compositionQuestion (value, description, autosequence){
+    var newDescription = description;
+    for (var i=0; i<value.length; i+=1) {
+      newDescription += (autosequence)?`\n\n${i+1 + " - " + value[i].ret}`:`\n\n${value[i].ret}`;
+    }
+    return newDescription;
+  }
+
   function sendDebug(msg) {
     // don't put blank errors in sidebar (but do add to logs)
     //if ((msg.msg === "") && (msg.hasOwnProperty("level")) && (msg.level === 20)) { return; }
@@ -241,9 +250,26 @@ module.exports = function(RED) {
     RED.comms.publish("debug",msg);
   }
 
+  String.prototype.greeting = function greeting()
+  {
+      var originalValue = this
+      var valueGreeting = "";
+      var mdata      = new Date()
+      var mhora      = mdata.getHours()
+      
+      if (mhora < 12)
+        valueGreeting = "Bom dia";
+      else if(mhora >=12 && mhora < 18)
+        valueGreeting = "Boa tarde";
+      else if(mhora >= 18 && mhora < 24)
+        valueGreeting = "Boa noite";
+          
+      return originalValue.replace("{greeting}", valueGreeting)
+  }
+
   var request = require('request');
 
-  function sendMessage(msg, node){
+  function sendMessage(msg, node, question){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
     var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
@@ -262,8 +288,8 @@ module.exports = function(RED) {
     });
 
     // exit if empty appusers
-    if (msg.payload.appusers == null || (!msg.payload.appusers)) {
-      node.warn('msg.payload.appusers are missing or null');
+    if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+      node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
       return;
     }
     // exit if empty appid
@@ -272,10 +298,18 @@ module.exports = function(RED) {
       return;
     }
 
-    // exit if empty appid
-    if (msg.payload.msgBody == null) {
-      node.warn('msg.payload.appid are missing');
-      return;
+    var bodyMsg = null;
+    // exit if empty msgBody
+    if ((msg.payload.msgBody === undefined) || (msg.payload.msgBody === null) ) {
+      if(question != null)
+      {
+        bodyMsg = {"text":question, "role":"appMaker", "type": "text"};
+      }
+      else
+      {
+        node.warn('msg.payload.msgBody or msg.payload.valuemsg are missing');
+        return;
+      }
     }
 
     var opts = {
@@ -287,11 +321,11 @@ module.exports = function(RED) {
       body:null,
     };
     
-    var appusers = msg.payload.appusers;
-    var apps = (msg.payload.appid)?msg.payload.appid:smoochNode.appid;
+    var appusers = msg.payload.appusers || msg.payload.appUser._id;
+    var apps = msg.payload.appid || smoochNode.appid;
     var username = smoochNode.credentials.username;
     var password = smoochNode.credentials.password;
-    var msgBody = msg.payload.msgBody;
+    var msgBody = bodyMsg || msg.payload.msgBody;
     var host = smoochNode.credentials.host;
     var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
 
@@ -361,9 +395,15 @@ module.exports = function(RED) {
       this.previousValue = null;
       var valid = true;
       var repair = n.repair;
+      var useretvalue = n.useretvalue;
+      var autosequence = n.autosequence;
       var needsCount = repair;
-      var name = n.name;
-      var question = n.question;
+      var name = n.name.replace(" ","").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
+      var nameOriginal = n.name;
+      var question = (useretvalue)?compositionQuestion(this.rules,n.question,autosequence):n.question;
+      var questionOrigem = n.question.greeting();
+
+      question = question.greeting();
 
       //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
       var contextQuestion = this.context().flow;
@@ -561,47 +601,52 @@ module.exports = function(RED) {
                       node.warn(err);
                       done();
                   } else {
+                        
+                        // exit if empty appusers
+                        if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+                          node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
+                          return;
+                        }
+                        var appusers = msg.payload.appusers || msg.payload.appUser._id;
 
-                      if(!contextQuestion.get("user-"+msg.payload.appusers))
+                      if(!contextQuestion.get("user-"+appusers))
                       { 
-                        var users = {"id":msg.payload.appusers, "questions":[], "done":false};
-                        contextQuestion.set("user-"+msg.payload.appusers, users)
+                        var users = {"id":appusers, "questions":[], "done":false};
+                        contextQuestion.set("user-"+appusers, users)
                       }
-                      var dados = contextQuestion.get("user-"+msg.payload.appusers)
+                      var dados = contextQuestion.get("user-"+appusers)
 
                       var valores = searchObject(dados.questions, "name", name)
 
                       if(!valores)
                       {
-                        var quest = {"name":name,"original":null, "fristtime":true};
+                        var quest = {"nameOriginal":nameOriginal, "name": name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
                         dados.questions.push(quest);
-                        //node.warn(dados);
-                        msg.payload.msgBody.text = question;
-                        sendMessage(msg, node)
-                        done();
-                        return;
+                        //node.warn(property);
+                        sendMessage(msg, node, question)
+                        return done();
                       }
 
                       if(!valores.fristtime)
                       {
+                        var newVar = []
                         for (var i=0; i<valores.original.length; i+=1)
                         {
+                          newVar.push(null);
                           if(valores.original[i])
                           {
-                            valores.original[i] = msg;
+                            newVar[i] = msg;
                           }
                         }
                         if (err) {
                           node.warn(err);
                         } else {
                             if (!repair || !hasParts) {
-                                node.send(valores.original);
+                                node.send(newVar);
                             } else {
-                                sendGroupMessages(valores.original, msg);
+                                sendGroupMessages(newVar, msg);
                             }
                         }
-                        //node.warn(dados); // aqui é o lugar de verificação
-                        //node.warn("segundo"); 
                         done();
                       }
                       else
@@ -615,13 +660,11 @@ module.exports = function(RED) {
                                 } else {
                                     sendGroupMessages(onward, msg);
                                 }
-                                //var pergunta = {"nome":name,"original":onward};
                                 var idx = dados.questions.findIndex(x => x.name === name)
                                 dados.questions[idx].original = onward;
                                 dados.questions[idx].fristtime = false;
+                                dados.questions[idx].dataForm = property;
                             }
-                            //node.warn(dados); // aqui é o lugar de verificação
-                            //node.warn("primeiro"); 
                             done();
                         });
                      }
@@ -670,6 +713,7 @@ module.exports = function(RED) {
       }
 
       this.on('input', function(msg) {
+          msg.nameOriginal = nameOriginal;
           msg.nodename = name;
           processMessageQueue(msg);
       });

@@ -125,8 +125,8 @@
       defaults: {
           name: {value:""},
           postmessage: {value:""},
-          timeout: {value:"5", required:true},
-          timeoutUnits: {value:"Disabled"},
+          timeout: {value:"0", required:true},
+          timeoutUnits: {value:"disabled"},
           smooch:{value:"", type:"smooch"},
           debug: {value: false},
           returnquestion: {value: false},
@@ -159,7 +159,7 @@
           });
           if (!this.timeoutUnits) {
               $("#node-input-timeoutUnits option").filter(function() {
-                  return $(this).val() == 'seconds';
+                  return $(this).val() == 'disabled';
               }).attr('selected', true);
           }
         },

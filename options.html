@@ -22,7 +22,7 @@
   </div>
   <div class="form-row">
     <label for="node-input-question"><i class="fa fa-tag"></i> <span data-i18n="common.label.question">Question</span></label>
-    <div style="height: 100px; min-height:50px;" class="node-text-editor" id="node-input-question"></div>
+    <div style="height: 100px; min-height:40px;" class="node-text-editor" id="node-input-question"></div>
   </div>
   <div class="form-row">
       <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.property">Property</span></label>
@@ -39,9 +39,17 @@
       </select>
   </div>
   <div class="form-row">
-      <input type="checkbox" id="node-input-repair" style="display: inline-block; width: auto; vertical-align: top;">
-      <label style="width: auto;" for="node-input-repair"><span data-i18n="switch.label.repair">recreate message sequences</span></label></input>
+      <input type="checkbox" id="node-input-useretvalue" style="display: inline-block; width: auto; vertical-align: top;">
+      <label style="width: auto;" for="node-input-useretvalue"><span data-i18n="switch.label.useretvalue">Compose a message with return options?</span></label></input>
   </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-autosequence" style="display: inline-block; width: auto; vertical-align: top;">
+    <label style="width: auto;" for="node-input-autosequence"><span data-i18n="switch.label.autosequence">Autosequence compose message options?</span></label></input>
+ </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-repair" style="display: inline-block; width: auto; vertical-align: top;">
+    <label style="width: auto;" for="node-input-repair"><span data-i18n="switch.label.repair">recreate message sequences</span></label></input>
+ </div>
 </script>
 
 <script type="text/javascript">
@@ -100,9 +108,11 @@
           smooch:{value:"", type:"smooch"},
           property: {value:"payload", required:true, validate: RED.validators.typedInput("propertyType")},
           propertyType: { value:"msg" },
-          rules: {value:[{t:"eq", v:"", vt:"str"}]},
+          rules: {value:[{t:"eq", v:"", vt:"str", ret:""}]},
           checkall: {value:"true", required:true},
           repair: {value:false},
+          useretvalue: {value:false},
+          autosequence: {value:false},
           outputs: {value:1}
       },
       inputs: 1,
@@ -153,6 +163,7 @@
               var selectField = rule.find("select");
               var type = selectField.val()||"";
               var valueField = rule.find(".node-input-rule-value");
+              var retValueField = rule.find(".node-input-rule-ret");
               var typeField = rule.find(".node-input-rule-type-value");
               var numField = rule.find(".node-input-rule-num-value");
               var expField = rule.find(".node-input-rule-exp-value");
@@ -182,11 +193,12 @@
                       // valueField.hide();
                   } else {
                       valueField.typedInput("width",(newWidth-selectWidth-70));
+                      retValueField.typedInput("width",(newWidth-selectWidth-7));
                   }
               }
           }
 
-          $("#node-input-rule-container").css('min-height','150px').css('min-width','450px').editableList({
+          $("#node-input-rule-container").css('min-height','200px').css('min-width','350px').editableList({
               addItem: function(container,i,opt) {
                   if (!opt.hasOwnProperty('r')) {
                       opt.r = {};
@@ -203,6 +215,7 @@
                       whiteSpace: 'nowrap'
                   });
                   var row = $('<div/>').appendTo(container);
+                  var row1 = $('<div/>',{style:"padding-top: 5px;"}).appendTo(container);
                   var row2 = $('<div/>',{style:"padding-top: 5px; padding-left: 175px;"}).appendTo(container);
                   var row3 = $('<div/>',{style:"padding-top: 5px; padding-left: 102px;"}).appendTo(container);
                   var selectField = $('<select/>',{style:"width:120px; margin-left: 5px; text-align: center;"}).appendTo(row);
@@ -225,7 +238,10 @@
                   }
 
                   function createValueField(){
-                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['msg','flow','global','str','num','jsonata','env',previousValueType]});
+                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['flow','global','str','num']});
+                  }
+                  function createValueField1(){
+                      return $('<input/>',{class:"node-input-rule-ret",type:"text", style:"margin-left: 5px;"}).appendTo(row1).typedInput({default:'str',types:['flow','global','str','num']});;
                   }
 
                   function createNumValueField(){
@@ -263,6 +279,7 @@
                   }
 
                   var valueField = null;
+                  var retValueField = null;
                   var numValueField = null;
                   var expValueField = null;
                   var btwnAndLabel = null;
@@ -270,14 +287,25 @@
                   var btwnValue2Field = null;
                   var typeValueField = null;
 
+                  //<label for="node-input-question"><span data-i18n="common.label.question">Question</span></label>
+
                   var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
                   finalspan.append(' &#8594; <span class="node-input-rule-index">'+(i+1)+'</span> ');
+
+
+                  var labelRet = $('<span/>',{class:"node-input-rule-labelret",style:"float: right;margin-top: 6px;"}).appendTo(row1)
+                  labelRet.append(' &#8594; <span class="node-input-rule-labelret"> Out </span> ');
+
+
                   var caseSensitive = $('<input/>',{id:"node-input-rule-case-"+i,class:"node-input-rule-case",type:"checkbox",style:"width:auto;vertical-align:top"}).appendTo(row2);
                   $('<label/>',{for:"node-input-rule-case-"+i,style:"margin-left: 3px;"}).text(caseLabel).appendTo(row2);
                   selectField.on("change", function() {
                       var type = selectField.val();
                       if (valueField){
                           valueField.typedInput('hide');
+                      }
+                      if (retValueField){
+                        retValueField.typedInput('hide');
                       }
                       if (expValueField){
                           expValueField.typedInput('hide');
@@ -320,6 +348,10 @@
                                   valueField = createValueField();
                               }
                               valueField.typedInput('show');
+                              if (!retValueField){
+                                retValueField = createValueField1();
+                              }
+                              retValueField.typedInput('show');
                       }
                       if (type === "regex") {
                           row2.show();
@@ -375,6 +407,12 @@
                       }
                       valueField.typedInput('value',rule.v);
                       valueField.typedInput('type',rule.vt||'str');
+
+                      if (!retValueField){
+                        retValueField = createValueField1();
+                      }
+                      retValueField.typedInput('value',rule.ret);
+                      retValueField.typedInput('type',rule.vt||'str');
                   }
                   if (rule.case) {
                       caseSensitive.prop('checked',true);
@@ -454,6 +492,7 @@
                       r.vt = rule.find(".node-input-rule-exp-value").typedInput('type');
                   } else {
                       r.v = rule.find(".node-input-rule-value").typedInput('value');
+                      r.ret = rule.find(".node-input-rule-ret").typedInput('value');
                       r.vt = rule.find(".node-input-rule-value").typedInput('type');
                   }
                   if (type === "regex") {

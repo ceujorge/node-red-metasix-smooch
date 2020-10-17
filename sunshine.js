@@ -5,8 +5,6 @@ const { string } = require('./lib/helpers/validators');
 
 module.exports = function (RED) {
 
-
-
   function ourTimeout(handler, delay) {
       var toutID = setTimeout(handler, delay);
       return {
@@ -86,8 +84,8 @@ module.exports = function (RED) {
       });
 
       // exit if empty appusers
-      if (msg.payload.appusers == null || (!msg.payload.appusers)) {
-        node.warn('msg.payload.appusers are missing or null');
+      if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+        node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
         return;
       }
       // exit if empty appid
@@ -120,7 +118,7 @@ module.exports = function (RED) {
 
       var timedelay = msg.payload.delay || node.timeout;
 
-      var appusers = msg.payload.appusers;
+      var appusers = msg.payload.appusers || msg.payload.appUser._id;
       var apps = msg.payload.appid || smoochNode.appid;
       var username = smoochNode.credentials.username;
       var password = smoochNode.credentials.password;
@@ -197,10 +195,11 @@ module.exports = function (RED) {
                         text: "return menu: "+msgstatus
                       });
                     }
-                    else
+                    else if (returnquestion && clearuser)
                     {
-                      node.warn("Deselect the option to end the flow to work correctly!")
+                      node.warn("Deselect the option to clear the context that ends the flow to work correctly!");
                     }
+
                     if(clearuser)
                     {
                       var msgstatus = "user-"+appusers;
