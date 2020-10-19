@@ -237,8 +237,9 @@ module.exports = function(RED) {
 
   function compositionQuestion (value, description, autosequence){
     var newDescription = description;
-    for (var i=0; i<value.length; i+=1) {
-      newDescription += (autosequence)?`\n\n${i+1 + " - " + value[i].ret}`:`\n\n${value[i].ret}`;
+    for (var i=0; i<value.length; i++) {
+      if(value[i].ret !== undefined)
+        newDescription += (autosequence)?`\n\n${i+1 + " - " + value[i].ret}`:`\n\n${value[i].ret}`;
     }
     return newDescription;
   }
@@ -630,7 +631,7 @@ module.exports = function(RED) {
                       if(!valores.fristtime)
                       {
                         var newVar = []
-                        for (var i=0; i<valores.original.length; i+=1)
+                        for (var i=0; i<valores.original.length; i++)
                         {
                           newVar.push(null);
                           if(valores.original[i])
@@ -723,6 +724,6 @@ module.exports = function(RED) {
       });
   }
 
-  RED.nodes.registerType("options", optionsNode);
+  RED.nodes.registerType("Options", optionsNode);
 
 }

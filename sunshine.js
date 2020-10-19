@@ -5,6 +5,23 @@ const { string } = require('./lib/helpers/validators');
 
 module.exports = function (RED) {
 
+  String.prototype.greeting = function greeting()
+  {
+      var originalValue = this
+      var valueGreeting = "";
+      var mdata      = new Date()
+      var mhora      = mdata.getHours()
+      
+      if (mhora < 12)
+        valueGreeting = "Bom dia";
+      else if(mhora >=12 && mhora < 18)
+        valueGreeting = "Boa tarde";
+      else if(mhora >= 18 && mhora < 24)
+        valueGreeting = "Boa noite";
+          
+      return originalValue.replace("{greeting}", valueGreeting)
+  }
+
   function ourTimeout(handler, delay) {
       var toutID = setTimeout(handler, delay);
       return {
@@ -128,6 +145,8 @@ module.exports = function (RED) {
 
       opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
       opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
+
+      msgBody.text = msgBody.text.greeting();
       opts.body = msgBody;
 
       //Enable delay message.

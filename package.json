@@ -1,6 +1,6 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
     "cli-color": "^1.4.0",
@@ -21,7 +21,8 @@
     "nodes": {
       "sunshine": "sunshine.js",
       "options": "options.js",
-      "groupnav": "groupnav.js"
+      "breadcrumb": "breadcrumb.js",
+      "departmentsearch": "departmentsearch.js"
     }
   },
   "directories": {

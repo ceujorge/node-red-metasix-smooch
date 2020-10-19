@@ -11,36 +11,29 @@
   limitations under the License.
 -->
 
-<script type="text/html" data-template-name="groupnav">
+<script type="text/html" data-template-name="Department">
   <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name">Name</span></label>
       <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.property">Output Nav</span></label>
-    <input type="text" id="node-input-property" style="width: 70%"/>
-    <input type="hidden" id="node-input-outputs"/>
-  </div>
-  <div class="form-row">
-    <label for="node-input-propertyForm"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.propertyForm">Output Form</span></label>
-    <input type="text" id="node-input-propertyForm" style="width: 70%"/>
-    <input type="hidden" id="node-input-outputsForm"/>
-  </div>
-  <div class="form-row" id="type-details-grouptype">
-    <label for="node-input-grouptype" style="width: auto"><span>Type group navegate:</span></label>
-    <select id="node-input-grouptype" style="width:450px !important">
-      <option value="textquestion" data-i18n="groupnav.textquestion">Use question text</option>
-      <option value="nodename" data-i18n="groupnav.nodename">Use node name</option>
-    </select>
+    <label for="node-input-propertyin"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.propertyin">Property in</span></label>
+    <input type="text" id="node-input-propertyin" style="width: 70%"/>
+    <input type="hidden" id="node-input-propertyin"/>
   </div>
   <div class="form-row">
     <label for="node-input-buscaDepto"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.buscaDepto">Search department</span></label>
     <input type="text" id="node-input-buscaDepto" style="width: 70%"/>
     <input type="hidden" id="node-input-buscaDepto"/>
   </div>
+<div class="form-row">
+    <label for="node-input-propertyout"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.propertyout">Property out</span></label>
+    <input type="text" id="node-input-propertyout" style="width: 70%"/>
+    <input type="hidden" id="node-input-propertyout"/>
+</div>
 </script>
 
-<script type="text/x-red" data-help-name="groupnav">
+<script type="text/x-red" data-help-name="Department">
   <p>Provides a node for making http requests.</p>
   <p>The URL and HTTP method can be configured in the node, if they are left blank they should be set in an incoming message on <code>msg.url</code> and <code>msg.method</code>. Below is the full list of options available:</p>
   <ul>
@@ -67,25 +60,24 @@
 </script>
 
 <script type="text/javascript">
-  RED.nodes.registerType('groupnav',{
+  RED.nodes.registerType('Department',{
       category: 'sunshine',
-      name:"Groupnav",
+      name:"Department",
       color:"#DEB887",
       defaults: {
           name: {value:""},
-          property: {value:"textNav", required:true, validate: RED.validators.typedInput("propertyType")},
-          propertyForm: {value:"dataForm", required:true, validate: RED.validators.typedInput("propertyType")},
+          propertyin: {value:"payload", required:true, validate: RED.validators.typedInput("propertyType")},
+          propertyout: {value:"payload", required:true, validate: RED.validators.typedInput("propertyType")},
           buscaDepto: {value:"", required:true, validate: RED.validators.typedInput("propertyType2")},
           propertyType: { value:"msg" },
-          propertyType2: { value:"str" },
-          grouptype: {value:"textquestion"}
+          propertyType2: { value:"str" }
       },
       inputs:1,
       outputs:1,
-      icon: "envelope.svg",
+      icon: "font-awesome/fa-list-ol",
       label: function() {
         if (this.name) {
-          return this.name || "Groupnav";
+          return this.name || "Department";
         }
       },
       labelStyle: function() {
@@ -93,8 +85,8 @@
       },
       oneditprepare: function() {
           var node = this;
-          $("#node-input-property").typedInput({default:this.propertyType||'msg',types:['msg','flow','global','json','jsonata','env']});
-          $("#node-input-propertyForm").typedInput({default:this.propertyType||'msg',types:['msg','flow','global','json','jsonata','env']});
+          $("#node-input-propertyin").typedInput({default:this.propertyType||'msg',types:['msg','flow','global','json','jsonata','env']});
+          $("#node-input-propertyout").typedInput({default:this.propertyType||'msg',types:['msg','flow','global','json','jsonata','env']});
           $("#node-input-buscaDepto").typedInput({default:this.propertyType2||'str',types:['str','json']});
           if (!this.grouptype) {
               $("#node-input-grouptype option").filter(function() {
@@ -103,8 +95,8 @@
           }
         },
       oneditsave: function() {
-        this.propertyType = $("#node-input-property").typedInput('type');
-        this.propertyType = $("#node-input-propertyForm").typedInput('type');
+        this.propertyType = $("#node-input-propertyin").typedInput('type');
+        this.propertyType = $("#node-input-propertyout").typedInput('type');
         this.propertyType2 = $("#node-input-buscaDepto").typedInput('type');
       }
   });

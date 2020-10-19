@@ -11,7 +11,7 @@
   limitations under the License.
 -->
 
-<script type="text/html" data-template-name="options">
+<script type="text/html" data-template-name="Options">
   <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="options.options.name">Name</span></label>
       <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
@@ -99,7 +99,7 @@
       }
       return clipValueLength(v);
   }
-  RED.nodes.registerType('options', {
+  RED.nodes.registerType('Options', {
       color: "#DEB887",
       category: 'sunshine',
       defaults: {
@@ -135,7 +135,7 @@
               return label;
           }
       },
-      icon: "switch.svg",
+      icon: "switch.png",
       label: function() {
           return this.name||this._("switch.switch");
       },

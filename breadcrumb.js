@@ -7,7 +7,7 @@ module.exports = function (RED) {
 
   var debuglength = RED.settings.debugMaxLength || 1000;
 
-  function groupnav(n) {
+  function Breadcrumb(n) {
     RED.nodes.createNode(this, n);
     var node = this;
     node.name = n.name;
@@ -19,9 +19,6 @@ module.exports = function (RED) {
 
     node.propertyType2 = n.propertyType2;
 
-    var propertyType2 = node.propertyType2;
-
-    var buscaDepto = node.buscaDepto;
     var propertyForm = node.propertyForm;
     var property = node.property;
  
@@ -52,22 +49,22 @@ module.exports = function (RED) {
       if(!userContext.done)
       {
         var resultNav = "";
-        var dataForm = "";
+        var resultForm = "";
 
-        for (var i=0; i<userContext.questions.length; i+=1)
+        for (var i=0; i<userContext.questions.length; i++)
         {
           if(userContext.questions[i].original !== null )
           {
-            for (var y=0; y<userContext.questions[i].original.length; y+=1)
+            for (var y=0; y<userContext.questions[i].original.length; y++)
             {
               if(userContext.questions[i].original[y] !== null)
               {
                 if(grouptype === "textquestion"){
-                  dataForm += userContext.questions[i].text + " : " + userContext.questions[i].dataForm + " | ";
+                  resultForm += userContext.questions[i].text + " : " + userContext.questions[i].dataForm + " | ";
                   resultNav += userContext.questions[i].text + " : " + userContext.questions[i].original[y].userret + " | ";
                 }
                 else{
-                  dataForm += userContext.questions[i].nameOriginal + " : " + userContext.questions[i].dataForm + " | ";
+                  resultForm += userContext.questions[i].nameOriginal + " : " + userContext.questions[i].dataForm + " | ";
                   resultNav += userContext.questions[i].nameOriginal + " : " + userContext.questions[i].original[y].userret + " | ";
                 }
               }
@@ -75,31 +72,10 @@ module.exports = function (RED) {
           }
         }
 
-        RED.util.setMessageProperty(msg,propertyForm,dataForm.slice(0,dataForm.length-4))
-        RED.util.setMessageProperty(msg,property,resultNav.slice(0,resultNav.length-4))
+        RED.util.setMessageProperty(msg,propertyForm,resultForm.slice(0,resultForm.length-3))
+        RED.util.setMessageProperty(msg,property,resultNav.slice(0,resultNav.length-3))
 
-        if(buscaDepto !== "")
-        {
-          if(propertyType2 === "json")
-          {
-            if(msg.payload.department)
-            {
-              var dptolist =  JSON.parse(buscaDepto);
-              var dpto = procurarIndice(dptolist,"id", msg.payload.department);
-              msg.payload.department = dpto.departamento;
-            }
-            else
-            {
-              node.warn("msg.payload.department are missing")
-            }
-          }
-          else
-          {
-            msg.payload.department = buscaDepto
-          }
-        }
-
-      userContext.done = true;
+        userContext.done = true;
     }
 
     node.send(msg);
@@ -107,15 +83,7 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("groupnav", groupnav);
-
-  function procurarIndice(arraySearch, atributo, valor){
-      var chave = atributo;
-      var valor = valor;
-      return arraySearch.filter(function (el) {
-          return el[chave] == valor;
-      })[0];
-  }
+  RED.nodes.registerType("Breadcrumb", Breadcrumb);
 
 };
 
