@@ -9,7 +9,8 @@
     "pb-util": "^0.1.0",
     "prettyjson": "^1.2.1",
     "request": "^2.88.0",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "cron": "1.7.2"
   },
   "keywords": [
     "node-red",
@@ -22,7 +23,8 @@
       "sunshine": "sunshine.js",
       "options": "options.js",
       "breadcrumb": "breadcrumb.js",
-      "departmentsearch": "departmentsearch.js"
+      "departmentsearch": "departmentsearch.js",
+      "inactivity": "inactivity.js"
     }
   },
   "directories": {

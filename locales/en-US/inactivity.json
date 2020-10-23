@@ -1,11 +1,4 @@
 {
-    "options":{
-        "options":"Options",
-        "label":{
-            "question":"Question",
-            "provider":"Provider"
-        }
-    },
     "common": {
         "label": {
             "payload": "Payload",

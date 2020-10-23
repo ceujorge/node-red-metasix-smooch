@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 
+const { indexOf } = require('cli-color/beep');
+
 module.exports = function(RED) {
   "use strict";
 
@@ -244,6 +246,28 @@ module.exports = function(RED) {
     return newDescription;
   }
 
+  function compositionQuestionButton (value, description, autosequence){
+    var buttons = [];
+    var dataActions;
+    var payload;
+
+    for (var i=0; i<value.length; i++) {
+      if(value[i].ret !== undefined)
+      { 
+         dataActions = (autosequence)?`${i+1 + " - " + value[i].ret}`:`${value[i].ret}`;
+         payload = value[i].v;
+         buttons.push({"type": 'reply', "text": dataActions, "payload": payload});
+      }
+    }
+
+    return {
+        text: description.greeting(),
+        role: "appMaker",
+        type: "text",
+        actions: buttons
+    };
+  }
+
   function sendDebug(msg) {
     // don't put blank errors in sidebar (but do add to logs)
     //if ((msg.msg === "") && (msg.hasOwnProperty("level")) && (msg.level === 20)) { return; }
@@ -265,12 +289,12 @@ module.exports = function(RED) {
       else if(mhora >= 18 && mhora < 24)
         valueGreeting = "Boa noite";
           
-      return originalValue.replace("{greeting}", valueGreeting)
+      return originalValue.replace("{greeting}", valueGreeting.toLowerCase()).replace("{Greeting}", valueGreeting);
   }
 
   var request = require('request');
 
-  function sendMessage(msg, node, question){
+  function sendMessage(msg, node, question, questionWhatsapp){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
     var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
@@ -302,9 +326,20 @@ module.exports = function(RED) {
     var bodyMsg = null;
     // exit if empty msgBody
     if ((msg.payload.msgBody === undefined) || (msg.payload.msgBody === null) ) {
-      if(question != null)
+      if(question != null )
       {
-        bodyMsg = {"text":question, "role":"appMaker", "type": "text"};
+          if("object" === typeof question){
+              if((msg.payload.messages !== undefined) && (msg.payload.messages[0].source.type !== "whatsapp")){
+                bodyMsg = question;
+              }
+              else
+              {
+                bodyMsg = {"text":questionWhatsapp, "role":"appMaker", "type": "text"};
+              }
+          }
+          else{
+            bodyMsg = {"text":question, "role":"appMaker", "type": "text"};
+          }
       }
       else
       {
@@ -312,6 +347,8 @@ module.exports = function(RED) {
         return;
       }
     }
+
+    node.warn(bodyMsg);
 
     var opts = {
       method: "POST",
@@ -390,6 +427,7 @@ module.exports = function(RED) {
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
       this.name = n.name;
+
       this.question = n.question;
 
       this.checkall = n.checkall || "true";
@@ -398,13 +436,25 @@ module.exports = function(RED) {
       var repair = n.repair;
       var useretvalue = n.useretvalue;
       var autosequence = n.autosequence;
+      var actionbutton = n.actionbutton;
       var needsCount = repair;
       var name = n.name.replace(" ","").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
       var nameOriginal = n.name;
-      var question = (useretvalue)?compositionQuestion(this.rules,n.question,autosequence):n.question;
       var questionOrigem = n.question.greeting();
 
-      question = question.greeting();
+      var question;
+      var questionWhatsapp;
+      if(actionbutton)
+      {
+        question = compositionQuestionButton(this.rules,n.question,autosequence);
+        questionWhatsapp = (useretvalue)?compositionQuestion(this.rules,n.question,autosequence):n.question;
+        questionWhatsapp = questionWhatsapp.greeting();
+      }
+      else
+      {
+        question = (useretvalue)?compositionQuestion(this.rules,n.question,autosequence):n.question;
+        question = question.greeting();
+      }
 
       //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
       var contextQuestion = this.context().flow;
@@ -612,7 +662,7 @@ module.exports = function(RED) {
 
                       if(!contextQuestion.get("user-"+appusers))
                       { 
-                        var users = {"id":appusers, "questions":[], "done":false};
+                        var users = {"id":appusers,"lasttime": new Date(), "questions":[], "done":false};
                         contextQuestion.set("user-"+appusers, users)
                       }
                       var dados = contextQuestion.get("user-"+appusers)
@@ -624,7 +674,7 @@ module.exports = function(RED) {
                         var quest = {"nameOriginal":nameOriginal, "name": name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
                         dados.questions.push(quest);
                         //node.warn(property);
-                        sendMessage(msg, node, question)
+                        sendMessage(msg, node, question, questionWhatsapp)
                         return done();
                       }
 

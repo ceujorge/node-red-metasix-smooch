@@ -13,43 +13,69 @@
 
 <script type="text/html" data-template-name="Options">
   <div class="form-row">
-      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="options.options.name">Name</span></label>
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
       <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
   </div>
+
   <div class="form-row">
-    <label for="node-input-smooch"><i class="fa fa-globe"></i> <span>Provider</span></label>
-    <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
-  </div>
-  <div class="form-row">
-    <label for="node-input-question"><i class="fa fa-tag"></i> <span data-i18n="common.label.question">Question</span></label>
-    <div style="height: 100px; min-height:40px;" class="node-text-editor" id="node-input-question"></div>
-  </div>
-  <div class="form-row">
-      <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.property">Property</span></label>
-      <input type="text" id="node-input-property" style="width: 70%"/>
-      <input type="hidden" id="node-input-outputs"/>
-  </div>
-  <div class="form-row node-input-rule-container-row">
-      <ol id="node-input-rule-container"></ol>
-  </div>
-  <div class="form-row">
-      <select id="node-input-checkall" style="width:100%; margin-right:5px;">
-          <option value="true" data-i18n="options.checkall">checking all rules</option>
-          <option value="false" data-i18n="switch.stopfirst">stopping after first match</option>
-      </select>
-  </div>
-  <div class="form-row">
-      <input type="checkbox" id="node-input-useretvalue" style="display: inline-block; width: auto; vertical-align: top;">
-      <label style="width: auto;" for="node-input-useretvalue"><span data-i18n="switch.label.useretvalue">Compose a message with return options?</span></label></input>
-  </div>
-  <div class="form-row">
-    <input type="checkbox" id="node-input-autosequence" style="display: inline-block; width: auto; vertical-align: top;">
-    <label style="width: auto;" for="node-input-autosequence"><span data-i18n="switch.label.autosequence">Autosequence compose message options?</span></label></input>
+    <ul style="min-width: 600px; margin-bottom: 20px;" id="func-tabs"></ul>
  </div>
-  <div class="form-row">
-    <input type="checkbox" id="node-input-repair" style="display: inline-block; width: auto; vertical-align: top;">
-    <label style="width: auto;" for="node-input-repair"><span data-i18n="switch.label.repair">recreate message sequences</span></label></input>
- </div>
+ <div id="func-tabs-content" style="min-height: calc(100% - 95px);">
+
+    <div id="func-tab-init" style="display:none">
+        <div class="form-row" style="margin-bottom: 0px;">
+            <input type="hidden" id="node-input-initialize" autofocus="autofocus">
+        </div>
+        <div class="form-row">
+            <label for="node-input-smooch"><i class="fa fa-globe"></i> <span data-i18n="options.label.provider"></span></label>
+            <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
+        </div>
+        <div class="form-row node-text-editor-row" style="position:relative">
+            <label for="node-input-question"><i class="fa fa-tag"></i> <span data-i18n="options.label.question"></span></label>
+            <div style="height: 250px; min-height:150px; margin-top: 30px;" class="node-text-editor" id="node-input-question" ></div>
+        </div>
+        <div class="form-row">
+            <select id="node-input-checkall" style="width:100%; margin-right:5px;">
+                <option value="true" data-i18n="switch.checkall">checking all rules</option>
+                <option value="false" data-i18n="switch.stopfirst">stopping after first match</option>
+            </select>
+        </div>
+        <div class="form-row">
+          <input type="checkbox" id="node-input-repair" style="display: inline-block; width: auto; vertical-align: top;">
+          <label style="width: auto;" for="node-input-repair"><span data-i18n="switch.label.repair">recreate message sequences</span></label></input>
+       </div>
+    </div>
+
+    <div id="func-tab-body" style="display:none">
+        <div class="form-row" style="margin-bottom: 0px;">
+            <input type="hidden" id="node-input-func" autofocus="autofocus">
+            <input type="hidden" id="node-input-noerr">
+        </div>
+          <div class="form-row">
+              <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> <span data-i18n="switch.label.property">Property</span></label>
+              <input type="text" id="node-input-property" style="width: 70%"/>
+              <input type="hidden" id="node-input-outputs"/>
+          </div>
+          <div class="form-row node-input-rule-container-row">
+              <ol id="node-input-rule-container"></ol>
+          </div>
+          <div class="form-row">
+            <input type="checkbox" id="node-input-useretvalue" style="display: inline-block; width: auto; vertical-align: top;">
+            <label style="width: auto;" for="node-input-useretvalue"><span data-i18n="switch.label.useretvalue">Compose a message with return options?</span></label></input>
+         </div>
+         <div class="form-row">
+           <input type="checkbox" id="node-input-autosequence" style="display: inline-block; width: auto; vertical-align: top;">
+           <label style="width: auto;" for="node-input-autosequence"><span data-i18n="switch.label.autosequence">Autosequence compose message options?</span></label></input>
+        </div>
+        <div class="form-row">
+            <input type="checkbox" id="node-input-actionbutton" style="display: inline-block; width: auto; vertical-align: top;">
+            <label style="width: auto;" for="node-input-actionbutton"><span data-i18n="switch.label.actionbutton">Use action button as an option for user?</span></label></input>
+        </div>
+    </div>
+
+</div>
+
+  
 </script>
 
 <script type="text/javascript">
@@ -112,6 +138,7 @@
           checkall: {value:"true", required:true},
           repair: {value:false},
           useretvalue: {value:false},
+          actionbutton: {value:false},
           autosequence: {value:false},
           outputs: {value:1}
       },
@@ -137,7 +164,7 @@
       },
       icon: "switch.png",
       label: function() {
-          return this.name||this._("switch.switch");
+          return this.name||this._("options.options");
       },
       labelStyle: function() {
           return this.name?"node_label_italic":"";
@@ -157,6 +184,91 @@
             mode: 'ace/mode/text',
             value: this.question
           });
+
+          // monta as tabs
+
+          var tabs = RED.tabs.create({
+              id: "func-tabs",
+              onchange: function(tab) {
+                  $("#func-tabs-content").children().hide();
+                  $("#" + tab.id).show();
+              }
+          });
+          tabs.addTab({
+              id: "func-tab-init",
+              label: "Question"
+          });
+          tabs.addTab({
+              id: "func-tab-body",
+              label: "Options"
+          });
+          tabs.activateTab("func-tab-body");
+
+          RED.library.create({
+              url:"functions", // where to get the data from
+              type:"function", // the type of object the library is for
+              editor:this.editor, // the field name the main text body goes to
+              mode:"ace/mode/nrjavascript",
+              fields:[
+                  'name', 'outputs',
+                  {
+                      name: 'Questions',
+                      get: function() {
+                          return that.editor.getValue();
+                      },
+                      set: function(v) {
+                          that.editor.setValue(v||RED._("node-red:function.text.initialize"), -1);
+                      }
+                  },
+                  {
+                      name: 'Options',
+                      get: function() {
+                          return that.finalizeEditor.getValue();
+                      },
+                      set: function(v) {
+                          that.finalizeEditor.setValue(v||RED._("node-red:function.text.finalize"), -1);
+                      }
+                  },
+                  {
+                      name: 'info',
+                      get: function() {
+                          return that.infoEditor.getValue();
+                      },
+                      set: function(v) {
+                          that.infoEditor.setValue(v||"", -1);
+                      }
+                  }
+              ],
+              ext:"js"
+          });
+          this.editor.focus();
+
+          var expandButtonClickHandler = function(editor) {
+              return function(e) {
+                  e.preventDefault();
+                  var value = editor.getValue();
+                  RED.editor.editJavaScript({
+                      value: value,
+                      width: "Infinity",
+                      cursor: editor.getCursorPosition(),
+                      mode: "ace/mode/nrjavascript",
+                      complete: function(v,cursor) {
+                          editor.setValue(v, -1);
+                          editor.gotoLine(cursor.row+1,cursor.column,false);
+                          setTimeout(function() {
+                              editor.focus();
+                          },300);
+                      }
+                  })
+              }
+          }
+          $("#node-init-expand-js").on("click", expandButtonClickHandler(this.initEditor));
+          $("#node-function-expand-js").on("click", expandButtonClickHandler(this.editor));
+          $("#node-finalize-expand-js").on("click", expandButtonClickHandler(this.finalizeEditor));
+
+          RED.popover.tooltip($("#node-init-expand-js"), RED._("node-red:common.label.expand"));
+          RED.popover.tooltip($("#node-function-expand-js"), RED._("node-red:common.label.expand"));
+          RED.popover.tooltip($("#node-finalize-expand-js"), RED._("node-red:common.label.expand"));
 
           function resizeRule(rule) {
               var newWidth = rule.width();
@@ -198,7 +310,7 @@
               }
           }
 
-          $("#node-input-rule-container").css('min-height','200px').css('min-width','350px').editableList({
+          $("#node-input-rule-container").css('min-height','400px').css('min-width','350px').editableList({
               addItem: function(container,i,opt) {
                   if (!opt.hasOwnProperty('r')) {
                       opt.r = {};
