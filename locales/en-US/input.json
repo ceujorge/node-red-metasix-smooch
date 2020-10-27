@@ -30,9 +30,6 @@
             "nooverride": "Warning: msg properties can no longer override set node properties. See bit.ly/nr-override-msg-props"
         }
     },
-    "inactivity": {
-        "attempts":"attempts"
-    },
     "inject": {
         "inject": "inject",
         "repeat": "repeat = __repeat__",
