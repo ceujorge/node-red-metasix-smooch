@@ -87,7 +87,7 @@
           upload: {value:false},
           property: {value:"payload.trigger", required:true, validate: RED.validators.typedInput("propertyType")},
           propertyType: { value:"msg" },
-          filter: {value:"payload.trigger", required:false, validate: RED.validators.typedInput("propertyTypeFilter")},
+          filter: {value:"message:appUser", required:false, validate: RED.validators.typedInput("propertyTypeFilter")},
           propertyTypeFilter: { value:"str" },
           swaggerDoc: {type:"swagger-doc", required:false},
           firstMessageBypass: {value: true },
@@ -95,6 +95,7 @@
       },
       inputs:0,
       outputs:2,
+      outputLabels: ["Speaking","Firsttime"],
       icon: "input-queue.svg",
       label: function() {
           if (this.name) {

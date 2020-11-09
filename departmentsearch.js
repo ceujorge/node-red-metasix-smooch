@@ -29,6 +29,27 @@ module.exports = function (RED) {
 
       var valorin = null;
 
+      if(!msg.payload.appUser)
+      {
+        node.warn("msg.payload.appUser._id are missing or null");
+        return;
+      }
+
+      var appusers = msg.payload.appUser._id || msg.payload.appusers;
+
+      //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
+    var contextSend = this.context().flow;
+
+      var user_key = "user-" + appusers;
+
+      if(!contextSend.get(user_key))
+      {
+        node.warn("Context flow user dos not exist!!!");
+        return;
+      }
+
+      var userContext = contextSend.get(user_key);
+
       RED.util.evaluateNodeProperty(propertyin,propertyType,node,msg, function(err,value) {
         if (err) {
           node.warn(err);
@@ -67,9 +88,11 @@ module.exports = function (RED) {
         }
       }
 
+      userContext.department = dptoValor;
+
       RED.util.setMessageProperty(msg,propertyout,dptoValor)
       
-    node.send(msg)
+      node.send(msg)
 
     });
   }

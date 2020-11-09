@@ -1,0 +1,139 @@
+<!--
+  Copyright 2013, 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<script type="text/html" data-template-name="One Send">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name">Name</span></label>
+      <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-smooch"><i class="fa fa-globe"></i> <span>Provider</span></label>
+      <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
+  </div>
+  <div class="form-row">
+    <label for="node-input-postmessage"><i class="fa fa-tag"></i> <span data-i18n="common.label.postmessage">Message</span></label>
+    <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-postmessage"></div>
+  </div>
+  <div class="form-row" id="delay-details-for">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span data-i18n="delay.for">Delay</span></label>
+    <input type="text" id="node-input-timeout" style="text-align:end; width:90px !important">
+    <select id="node-input-timeoutUnits" style="width:200px !important">
+      <option value="disabled" data-i18n="delay.disabled">disabled</option>
+      <option value="milliseconds" data-i18n="delay.milisecs">milliseconds</option>
+      <option value="seconds" data-i18n="delay.secs">seconds</option>
+      <option value="minutes" data-i18n="delay.mins">minutes</option>
+      <option value="hours" data-i18n="delay.hours">hours</option>
+      <option value="days" data-i18n="delay.days">days</option>
+    </select>
+  </div>
+  <div class="form-row">
+      <input type="checkbox" id="node-input-debug" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-debug" style="width: auto"><span>Debug print?</span></label>
+  </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-returnquestion" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-returnquestion" style="width: auto"><span>Change the status of the user context to return the question (used in invalid options)</span></label>
+  </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-clearuser" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-clearuser" style="width: auto"><span>Clearing context flow user variable? (use to complete flow)</span></label>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="One Send">
+  <p>Provides a node for making http requests.</p>
+  <p>The URL and HTTP method can be configured in the node, if they are left blank they should be set in an incoming message on <code>msg.url</code> and <code>msg.method</code>. Below is the full list of options available:</p>
+  <ul>
+      <li><code>msg.url</code>, if set, is used as the url of the request. Must start with http: or https:</li>
+      <li><code>msg.method</code>, if set, is used as the HTTP method of the request.
+      Must be one of <code>GET</code>, <code>PUT</code>, <code>POST</code>, <code>PATCH</code> or <code>DELETE</code> (default: GET).</li>
+      <li><code>msg.headers</code>, if set, should be an object containing field/value
+      pairs to be added as request headers.</li>
+      <li><code>msg.payload</code> is sent as the body of the request.</li>
+      <li><code>msg.request.options</code> is set as options of the request. Please refer to the documentation of request module. <strong>Use only when you know what you are doing as this will override options derived by the node.</strong></li>
+  </ul>
+  <p>When configured within the node, the URL property can contain <a href="http://mustache.github.io/mustache.5.html" target="_new">mustache-style</a> tags. These allow the
+  url to be constructed using values of the incoming message. For example, if the url is set to
+  <code>example.com/{{{topic}}}</code>, it will have the value of <code>msg.topic</code> automatically inserted.
+  Using {{{...}}} prevents mustache from escaping characters like / & etc.</p>
+  <p>
+  The output message contains the following properties:
+  <ul>
+      <li><code>payload</code> is the body of the response</li>
+      <li><code>statusCode</code> is the status code of the response, or the error code if the request could not be completed</li>
+      <li><code>headers</code> is an object containing the response headers</li>
+  </ul>
+  <p><b>Note</b>: If you need to configure a proxy please add <b>http_proxy=...</b> to your environment variables and restart Node-RED.</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('One Send',{
+      category: 'sunshine',
+      name:"One Send",
+      color:"#DEB887",
+      defaults: {
+          name: {value:""},
+          postmessage: {value:""},
+          timeout: {value:"0", required:true},
+          timeoutUnits: {value:"disabled"},
+          smooch:{value:"", type:"smooch"},
+          debug: {value: false},
+          returnquestion: {value: false},
+          clearuser: {value: false}
+      },
+      inputs:1,
+      outputs:1,
+      icon: "smooch.svg",
+      label: function() {
+        if (this.name) {
+          return this.name || "One Send";
+        }
+        if(this.timeoutUnits)
+        {
+          var units = this.timeoutUnits ? this.timeoutUnits.charAt(0) : "s";
+          if (this.timeoutUnits == "milliseconds") { units = "ms"; }
+          return this._("delay.label.delay")+" "+this.timeout+units;
+        }
+      },
+      labelStyle: function() {
+          return this.name?"node_label_italic":"";
+      },
+      oneditprepare: function() {
+          var node = this;
+          $( "#node-input-timeout" ).spinner({min:1});
+          this.editor = RED.editor.createEditor({
+            id: 'node-input-postmessage',
+            mode: 'ace/mode/text',
+            value: this.postmessage,
+          });
+          if (!this.timeoutUnits) {
+              $("#node-input-timeoutUnits option").filter(function() {
+                  return $(this).val() == 'disabled';
+              }).attr('selected', true);
+          }
+        },
+      oneditsave: function() {
+
+          this.postmessage = this.editor.getValue();
+          var val = this.editor.getValue();
+          this.editor.destroy();
+          delete this.editor;
+          $("#node-input-postmessage").val(val);
+      },
+      oneditcancel: function() {
+          this.editor.destroy();
+          delete this.editor;
+      }
+  });
+</script>
+
+

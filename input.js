@@ -241,12 +241,19 @@ module.exports = function(RED) {
         
         // Yes it's true: an incoming message just happened
         var userContext = node.context().flow;
+        var urlContext = node.context().flow;
+
+        if(!urlContext.get("urlchat"))
+        {
+            var pic = msg.req.headers.host.split(".");
+            urlContext.set("urlchat", pic[0].slice(4,pic[0].length));
+        }
 
         var appusers = "user-"+msg.payload.appUser._id;
 
         if(!userContext.get(appusers))
         { 
-            var users = {"id":msg.payload.appUser._id,"lasttime": new Date(), "questions":[], "falando":false, "done":false};
+            var users = {"id":msg.payload.appUser._id,"lasttime": new Date(), "questions":[], "onetimenode":[],"falando":false, "done":false};
             userContext.set(appusers,users)
         }
         var userFlow = userContext.get(appusers);
@@ -357,23 +364,38 @@ module.exports = function(RED) {
               var msgid = RED.util.generateId();
               res._msgid = msgid;
 
-              RED.util.evaluateNodeProperty(node.property,node.propertyType,node,{payload:req.body}, propertyin);
+              RED.util.evaluateNodeProperty(node.property,node.propertyType,node,{payload:req.body}, function(err,value) {
+                if (err) {
+                  node.warn(err);
+                } 
+                else
+                {
+                    propertyin = value;
+                }
+              });
 
-              RED.util.evaluateNodeProperty(node.filter,node.propertyTypeFilter,node,{payload:req.body}, filter);
+              RED.util.evaluateNodeProperty(node.filter,node.propertyTypeFilter,node,{payload:req.body}, function(err,value) {
+                if (err) {
+                  node.warn(err);
+                } 
+                else
+                {
+                    filter = value;
+                }
+              });
 
-              if (node.method.match(/^(post|delete|put|options|patch)$/) && (propertyin === filter || filter === "")) {
+              if (node.method.match(/^(post|delete|put|options|patch)$/) && (propertyin === filter)) {
                   //node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
                   simpleMessageQueueNode(node,{_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
-              } else if (node.method == "get" && (propertyin === filter || filter === "")) {
+              } else if (node.method == "get" && (propertyin === filter)) {
                   //node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.query});
                   simpleMessageQueueNode(node,{_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
               } else {
+                  //res.sendStatus(200);
                   //node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res)});
-                  simpleMessageQueueNode(node,{_msgid:msgid,req:req,res:createResponseWrapper(node,res)});
+                  //simpleMessageQueueNode(node,{_msgid:msgid,req:req,res:createResponseWrapper(node,res)});
               }
-
               res.sendStatus(200);
-
           };
 
           var httpMiddleware = function(req,res,next) { next(); }

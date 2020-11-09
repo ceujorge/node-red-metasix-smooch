@@ -1,6 +1,6 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.0.8",
+  "version": "0.1.6",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
     "cli-color": "^1.4.0",
@@ -17,7 +17,9 @@
     "cors": "2.8.5",
     "on-headers": "1.0.2",
     "is-utf8": "0.2.1",
-    "hash-sum": "2.0.0"
+    "hash-sum": "2.0.0",
+    "node-nlp": "^4.10.4",
+    "axios": "0.19.2"
   },
   "keywords": [
     "node-red",
@@ -32,7 +34,12 @@
       "breadcrumb": "breadcrumb.js",
       "departmentsearch": "departmentsearch.js",
       "inactivity": "inactivity.js",
-      "input": "input.js"
+      "input": "input.js",
+      "nlpchat": "nlpchat.js",
+      "cube-chat": "cube-chat.js",
+      "sendonetime": "sendonetime.js",
+      "checkaddress": "checkaddress.js",
+      "backto": "backto.js"
     }
   },
   "directories": {

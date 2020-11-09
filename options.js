@@ -105,7 +105,7 @@ module.exports = function(RED) {
               }
           });
       } else {
-          RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg,(err,value) => {
+          RED.util.evaluateNodeProperty(((actionbutton)?node.property.replce("text","payload"):node.property),node.propertyType,node,msg,(err,value) => {
               if (err) {
                   done(undefined,undefined);
               } else {
@@ -348,7 +348,7 @@ module.exports = function(RED) {
       }
     }
 
-    node.warn(bodyMsg);
+    //node.warn(bodyMsg);
 
     var opts = {
       method: "POST",
@@ -366,6 +366,12 @@ module.exports = function(RED) {
     var msgBody = bodyMsg || msg.payload.msgBody;
     var host = smoochNode.credentials.host;
     var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+
+    if(msg.payload.address){
+        msgBody.text = msgBody.text.replace("{address}", msg.payload.address) || "";
+    }
+
+    
 
     opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
     opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
@@ -662,7 +668,7 @@ module.exports = function(RED) {
 
                       if(!contextQuestion.get("user-"+appusers))
                       { 
-                        var users = {"id":appusers,"lasttime": new Date(), "questions":[], "done":false};
+                        var users = {"id":appusers,"lasttime": new Date(), "questions":[],"onetimenode":[], "done":false};
                         contextQuestion.set("user-"+appusers, users)
                       }
                       var dados = contextQuestion.get("user-"+appusers)
