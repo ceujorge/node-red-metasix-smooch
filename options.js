@@ -105,7 +105,7 @@ module.exports = function(RED) {
               }
           });
       } else {
-          RED.util.evaluateNodeProperty(((actionbutton)?node.property.replce("text","payload"):node.property),node.propertyType,node,msg,(err,value) => {
+          RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg,(err,value) => {
               if (err) {
                   done(undefined,undefined);
               } else {
@@ -433,6 +433,7 @@ module.exports = function(RED) {
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
       this.name = n.name;
+      this.actionbutton = n.actionbutton;
 
       this.question = n.question;
 
@@ -772,6 +773,12 @@ module.exports = function(RED) {
       this.on('input', function(msg) {
           msg.nameOriginal = nameOriginal;
           msg.nodename = name;
+
+        if(actionbutton){
+            if((msg.payload.messages !== undefined) && (msg.payload.messages[0].payload !== undefined) && (msg.payload.messages[0].source.type !== "whatsapp")){
+                msg.payload.messages[0].text = msg.payload.messages[0].payload;
+            }
+        }
           processMessageQueue(msg);
       });
 

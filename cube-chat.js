@@ -42,7 +42,6 @@ module.exports = function (RED) {
     
     var msgBody = msg.payload.msgBody;
 
-
     var urlchat = urlContext.get("urlchat") || "comercial";
 
     opts.url = "https://" + urlchat + "-chat.metasix.solutions/api/v1/chat.sendLivechatMessage";
@@ -151,6 +150,7 @@ module.exports = function (RED) {
       var userContext = contextSend.get(user_key);
       var valuetext;
       var valueform;
+      var nameUser;
 
 
       if(!userContext.falando)
@@ -189,8 +189,17 @@ module.exports = function (RED) {
           menssagem += msg.textForm;
       }
 
+      if(msg.payload.appUser.givenName && msg.payload.appUser.givenName !== "")
+      {
+          nameUser = msg.payload.appUser.givenName;
+      }
+      else
+      {
+          nameUser = msg.payload.messages[0].name;
+      }
+
       var chatCube = {
-        "name": msg.payload.appUser.givenName,
+        "name": nameUser,
         "departmentId":msg.payload.departament || userContext.department,
         "customRoom":{
            "transport":msg.payload.messages[0].source.type,
