@@ -151,6 +151,7 @@ module.exports = function (RED) {
       var valuetext;
       var valueform;
       var nameUser;
+      var rocketchat_bot;
 
 
       if(!userContext.falando)
@@ -174,6 +175,9 @@ module.exports = function (RED) {
             valuetext = value;
           }
         });
+
+        rocketchat_bot = userContext.rocketchat_bot || msg.payload.rocketchat_bot || null;
+
       }
 
       var menssagem="";
@@ -207,6 +211,18 @@ module.exports = function (RED) {
         },
         "msg": (msg.payload.messages[0].type === "image")?msg.payload.messages[0].mediaUrl:(menssagem || msg.payload.messages[0].text)
      }
+
+     
+     if(rocketchat_bot !== null)
+     {
+      chatCube.customRoom.rocketchat_bot = rocketchat_bot;
+     }
+
+     if(userContext.email)
+     {
+       chatCube.email = userContext.email
+     }
+
      msg.payload.msgBody = chatCube;
      userContext.falando = true;
      

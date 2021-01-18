@@ -1,31 +1,33 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "1.19.0",
     "cli-color": "^1.4.0",
+    "cookie-parser": "1.4.5",
+    "cors": "2.8.5",
+    "cron": "1.7.2",
+    "hash-sum": "2.0.0",
+    "is-utf8": "0.2.1",
     "moment": "^2.22.2",
+    "multer": "1.4.2",
+    "node-nlp": "^4.10.4",
     "node-pre-gyp": "^0.12.0",
+    "on-headers": "1.0.2",
     "pb-util": "^0.1.0",
     "prettyjson": "^1.2.1",
     "request": "^2.88.0",
-    "underscore": "^1.9.1",
-    "cron": "1.7.2",
-    "multer": "1.4.2",
-    "body-parser": "1.19.0",
-    "cookie-parser": "1.4.5",
-    "cors": "2.8.5",
-    "on-headers": "1.0.2",
-    "is-utf8": "0.2.1",
-    "hash-sum": "2.0.0",
-    "node-nlp": "^4.10.4",
-    "axios": "0.19.2"
+    "underscore": "^1.9.1"
   },
   "keywords": [
     "node-red",
     "api",
     "chatbot",
-    "sunshine conversation"
+    "sunshine conversation",
+    "metasix",
+    "Cleiton Jorge"
   ],
   "node-red": {
     "nodes": {
