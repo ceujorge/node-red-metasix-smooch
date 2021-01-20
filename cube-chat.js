@@ -10,7 +10,7 @@ module.exports = function (RED) {
 
   var request = require('request');
 
-  function sendMessage(msg, node){
+  function sendMessage(msg, node, userContext){
 
     var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
 
@@ -75,6 +75,7 @@ module.exports = function (RED) {
         
         msg.originalMessage = msg.payload;
         msg.payload = body;
+        userContext.rid = body.rid || null;
         msg.payload.appUser = msg.originalMessage.appUser;
         msg.headers = response.headers;
         msg.statusCode = response.statusCode;
@@ -176,7 +177,7 @@ module.exports = function (RED) {
           }
         });
 
-        rocketchat_bot = userContext.rocketchat_bot || msg.payload.rocketchat_bot || null;
+        rocketchat_bot = userContext.rocketchat_bot || null;
 
       }
 
@@ -212,21 +213,51 @@ module.exports = function (RED) {
         "msg": (msg.payload.messages[0].type === "image")?msg.payload.messages[0].mediaUrl:(menssagem || msg.payload.messages[0].text)
      }
 
-     
-     if(rocketchat_bot !== null)
-     {
-      chatCube.customRoom.rocketchat_bot = rocketchat_bot;
-     }
 
      if(userContext.email)
      {
        chatCube.email = userContext.email
      }
 
+     if(userContext.frmFields.length > 0)
+     {
+      var email = procurarIndice(userContext.frmFields,"name","email") || null;
+      var name = procurarIndice(userContext.frmFields,"name","name") || null;
+      var phone = procurarIndice(userContext.frmFields,"name","phone") || null;
+      var cpf = procurarIndice(userContext.frmFields,"name","cpf") || null;
+
+      if(email !== null)
+      {
+        chatCube.email = email.text;
+      }
+
+      if(name !== null)
+      {
+        chatCube.name = name.text;
+      }
+
+      if(phone !== null)
+      {
+        chatCube.phone = phone.text;
+      }
+
+      if(email !== null)
+      {
+        chatCube.cpf = cpf.text;
+      }
+
+      
+     }
+
+     if(rocketchat_bot !== null && userContext.falando === false)
+     {
+      chatCube.customRoom.rocketchat_bot_id = rocketchat_bot._id;
+     }
+
      msg.payload.msgBody = chatCube;
      userContext.falando = true;
      
-     sendMessage(msg,node);
+     sendMessage(msg,node,userContext);
       //RED.util.setMessageProperty(msg,propertyForm,resultForm.slice(0,resultForm.length-3))
       //RED.util.setMessageProperty(msg,property,resultNav.slice(0,resultNav.length-3))
 
@@ -234,6 +265,15 @@ module.exports = function (RED) {
   }
 
   RED.nodes.registerType("Chat Cube", ChatcubeNode);
+
+
+  function procurarIndice(arraySearch, atributo, valor){
+      var chave = atributo;
+      var valor = valor;
+      return arraySearch.filter(function (el) {
+          return el[chave] == valor;
+      })[0];
+  }
 
 };
 

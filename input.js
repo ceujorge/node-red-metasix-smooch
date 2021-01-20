@@ -242,6 +242,7 @@ module.exports = function(RED) {
         // Yes it's true: an incoming message just happened
         var userContext = node.context().flow;
         var urlContext = node.context().flow;
+        var frmFields = [];
 
         if(!urlContext.get("urlchat"))
         {
@@ -251,9 +252,14 @@ module.exports = function(RED) {
 
         var appusers = "user-"+msg.payload.appUser._id;
 
+        if(msg.payload.messages[0].fields)
+        {
+            frmFields = msg.payload.messages[0].fields || null;
+        }
+
         if(!userContext.get(appusers))
         { 
-            var users = {"id":msg.payload.appUser._id,"lasttime": new Date(), "questions":[], "onetimenode":[],"falando":false, "done":false};
+            var users = {"id":msg.payload.appUser._id,"lasttime": new Date(), "questions":[], "onetimenode":[],"falando":false, "done":false, "frmFields":frmFields};
             userContext.set(appusers,users)
         }
         var userFlow = userContext.get(appusers);

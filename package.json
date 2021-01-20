@@ -1,6 +1,6 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.1.11",
+  "version": "0.1.25",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
     "axios": "^0.21.1",

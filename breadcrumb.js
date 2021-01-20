@@ -60,6 +60,10 @@ module.exports = function (RED) {
               if(userContext.questions[i].original[y] !== null)
               {
                 if(grouptype === "textquestion"){
+                  if(msg.payload.messages[0].source.type === "whatsapp")
+                  {
+                    resultForm += "telefone Whatsapp : " + payload.appUser.userId + " \n ";
+                  }
                   resultForm += userContext.questions[i].text + " : " + userContext.questions[i].dataForm + " | ";
                   resultNav += userContext.questions[i].text + " : " + userContext.questions[i].original[y].userret + " | ";
                 }
