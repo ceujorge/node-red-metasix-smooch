@@ -64,6 +64,10 @@
             <label style="width: auto;" for="node-input-useretvalue"><span data-i18n="switch.label.useretvalue">Compose a message with return options?</span></label></input>
          </div>
          <div class="form-row">
+            <input type="checkbox" id="node-input-debug" style="display: inline-block; width: auto; vertical-align: top;">
+            <label for="node-input-debug" style="width: auto"><span>Debug print?</span></label>
+        </div>
+         <div class="form-row">
            <input type="checkbox" id="node-input-autosequence" style="display: inline-block; width: auto; vertical-align: top;">
            <label style="width: auto;" for="node-input-autosequence"><span data-i18n="switch.label.autosequence">Autosequence compose message options?</span></label></input>
         </div>
@@ -140,6 +144,7 @@
           useretvalue: {value:false},
           actionbutton: {value:false},
           autosequence: {value:false},
+          debug: {value: false},
           outputs: {value:1}
       },
       inputs: 1,

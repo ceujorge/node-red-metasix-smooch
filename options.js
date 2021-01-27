@@ -296,10 +296,9 @@ module.exports = function(RED) {
 
   var request = require('request');
 
-  function sendMessage(dados, msg, node, question, questionWhatsapp){
+  function sendMessage(debug, dados, msg, node, question, questionWhatsapp){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
-    var debug = false;//utils.extractValue('boolean', 'debug', node, msg, false);
 
     // exit if empty credentials
     if (smoochNode == null || smoochNode.credentials == null) {
@@ -369,11 +368,12 @@ module.exports = function(RED) {
     var host = smoochNode.credentials.host;
     var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
 
+    //verificar efetividade
     if(msg.payload.address){
         msgBody.text = msgBody.text.replace("{address}", msg.payload.address) || "";
     }
 
-    msgBody.text = msgBody.text.textFromDataForm(dados, msg);
+    msgBody.text = msgBody.text.textFromDataForm(node, dados, msg);
 
     opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
     opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
@@ -431,6 +431,7 @@ module.exports = function(RED) {
       RED.nodes.createNode(this, n);
       var node = this;
       node.smooch = n.smooch;
+      this.debug = n.debug;
       this.rules = n.rules || [];
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
@@ -442,6 +443,7 @@ module.exports = function(RED) {
       this.checkall = n.checkall || "true";
       this.previousValue = null;
       var valid = true;
+      var debug = n.debug;
       var repair = n.repair;
       var useretvalue = n.useretvalue;
       var autosequence = n.autosequence;
@@ -683,10 +685,10 @@ module.exports = function(RED) {
 
                       if(!valores)
                       {
-                        var quest = {"nameOriginal":nameOriginal, "name": name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
+                        var quest = {"nameOriginal":nameOriginal, name: name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
                         dados.questions.push(quest);
                         //node.warn(property);
-                        sendMessage(contextQuestion, msg, node, question, questionWhatsapp)
+                        sendMessage(debug, contextQuestion, msg, node, question, questionWhatsapp)
                         return done();
                       }
 

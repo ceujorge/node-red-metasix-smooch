@@ -180,7 +180,7 @@ module.exports = function (RED) {
                       });
                     }
                   } else {
-                    msg.payload = body;
+                    msg.return = body;
                     msg.headers = response.headers;
                     msg.statusCode = response.statusCode;
                     msg.appusers = appusers;
@@ -209,12 +209,13 @@ module.exports = function (RED) {
 
                     if(usrcontex.questions[idx].attemptsInvalid >= attempts)
                     {
-                      contextSend.set(msgstatus, undefined);
+                      //contextSend.set(msgstatus, undefined);
                       node.status({
                         fill: "red",
                         shape: "ring",
-                        text: "Attempts Invalid: "+msgstatus
+                        text: "Attempts Invalid: "+usrcontex.questions[idx].attemptsInvalid
                       });
+                      usrcontex.questions[idx].attemptsInvalid = 0
                       node.send(msg);
                     }
 

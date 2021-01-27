@@ -150,6 +150,7 @@ module.exports = function (RED) {
       opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
 
       msgBody.text = msgBody.text.greeting();
+      msgBody.text = msgBody.text.textFromDataForm(node, contextSend, msg);
       opts.body = msgBody;
 
       var msgstatus = "user-"+appusers;
