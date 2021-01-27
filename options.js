@@ -299,7 +299,7 @@ module.exports = function(RED) {
   function sendMessage(dados, msg, node, question, questionWhatsapp){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
-    var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
+    var debug = false;//utils.extractValue('boolean', 'debug', node, msg, false);
 
     // exit if empty credentials
     if (smoochNode == null || smoochNode.credentials == null) {

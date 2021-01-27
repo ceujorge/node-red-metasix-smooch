@@ -215,12 +215,13 @@ module.exports = function (RED) {
                         shape: "ring",
                         text: "Attempts Invalid: "+msgstatus
                       });
+                      node.send(msg);
                     }
 
                     if(debug)
                       sendDebug({id:node.id, z:node.z, _alias: node._alias,  path:node._flow.path, name:node.name, topic:msg.topic, msg:msg});
 
-                    node.send(msg);
+                    //node.send(msg);
                   }
                 })
 
