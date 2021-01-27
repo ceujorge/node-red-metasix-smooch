@@ -47,13 +47,12 @@ module.exports = function (RED) {
 
   var debuglength = RED.settings.debugMaxLength || 1000;
 
-  function Send(config) {
+  function invalidOption(config) {
     RED.nodes.createNode(this, config);
     var node = this;
     node.smooch = config.smooch;
     node.debug = config.debug;
-    node.returnquestion = config.returnquestion;
-    node.clearuser = config.clearuser;
+    node.attempts = config.attempts;
     node.timeoutUnits = config.timeoutUnits;
     node.postmessage = config.postmessage;
   
@@ -82,11 +81,9 @@ module.exports = function (RED) {
     this.on("input", function (msg) {
       var smoochNode = RED.nodes.getNode(node.smooch);
       var debug = utils.extractValue('boolean', 'debug', node, msg, false);
-      var returnquestion = utils.extractValue('boolean', 'returnquestion', node, msg, false);
-      var clearuser = utils.extractValue('boolean', 'clearuser', node, msg, false);
+      var attempts = utils.extractValue('string', 'attempts', node, msg, false);
       var valuemsg = utils.extractValue('string', 'postmessage', node, msg, false);
       
-
       // exit if empty credentials
       if (smoochNode == null || smoochNode.credentials == null) {
         node.warn('Sunshine credentials are missing.');
@@ -147,7 +144,7 @@ module.exports = function (RED) {
       opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
 
       msgBody.text = msgBody.text.greeting();
-      msgBody.text = msgBody.text.textFromDataForm(contextSend, msg);
+      msgBody.text = msgBody.text.textFromDataForm(contextSend,msg);
       
       opts.body = msgBody;
 
@@ -201,32 +198,22 @@ module.exports = function (RED) {
                       }
                     }
 
-                    if(returnquestion && !clearuser)
-                    {
-                      var msgstatus = "user-"+appusers;
-                      var usrcontex = contextSend.get("user-"+appusers);
-                      var idx = usrcontex.questions.findIndex(x => x.name === msg.nodename);
-                      usrcontex.questions[idx].fristtime = true;
+                    var msgstatus = "user-"+appusers;
+                    var usrcontex = contextSend.get(msgstatus);
+                    var idx = usrcontex.questions.findIndex(x => x.name === msg.nodename);
 
+                    if(!usrcontex.questions[idx].attemptsInvalid)
+                      usrcontex.questions[idx].attemptsInvalid = 0
+                        
+                    usrcontex.questions[idx].attemptsInvalid++;
+
+                    if(usrcontex.questions[idx].attemptsInvalid >= attempts)
+                    {
+                      contextSend.set(msgstatus, undefined);
                       node.status({
                         fill: "red",
                         shape: "ring",
-                        text: "return menu: "+msgstatus
-                      });
-                    }
-                    else if (returnquestion && clearuser)
-                    {
-                      node.warn("Deselect the option to clear the context that ends the flow to work correctly!");
-                    }
-
-                    if(clearuser)
-                    {
-                      var msgstatus = "user-"+appusers;
-                      contextSend.set("user-"+appusers, undefined);
-                      node.status({
-                        fill: "yellow",
-                        shape: "ring",
-                        text: "clean: "+msgstatus
+                        text: "Attempts Invalid: "+msgstatus
                       });
                     }
 
@@ -249,7 +236,7 @@ module.exports = function (RED) {
     node.on("close", function() { clearDelayList(); });
   }
 
-  RED.nodes.registerType("Send", Send);
+  RED.nodes.registerType("Invalid Option", invalidOption);
 
   function RemoteServerNode(n) {
     RED.nodes.createNode(this, n);
@@ -257,19 +244,6 @@ module.exports = function (RED) {
     this.appid = n.appid;
   }
 
-  RED.nodes.registerType('smooch', RemoteServerNode, {
-    credentials: {
-      host: {
-        type: 'text'
-      },
-      username: {
-        type: 'text'
-      },
-      password: {
-        type: 'text'
-      }
-    }
-  });
 
   function sendDebug(msg) {
     // don't put blank errors in sidebar (but do add to logs)

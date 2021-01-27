@@ -1,0 +1,113 @@
+<!--
+  Copyright 2013, 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/html" data-template-name="Invalid Option">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name">Name</span></label>
+      <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-smooch"><i class="fa fa-globe"></i> <span>Provider</span></label>
+      <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
+  </div>
+  <div class="form-row">
+    <label for="node-input-postmessage"><i class="fa fa-tag"></i> <span data-i18n="common.label.postmessage">Message</span></label>
+    <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-postmessage"></div>
+  </div>
+  <div class="form-row" id="delay-details-for">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> <span data-i18n="delay.for">Delay</span></label>
+    <input type="text" id="node-input-timeout" style="text-align:end; width:90px !important">
+    <select id="node-input-timeoutUnits" style="width:200px !important">
+      <option value="disabled" data-i18n="delay.disabled">disabled</option>
+      <option value="milliseconds" data-i18n="delay.milisecs">milliseconds</option>
+      <option value="seconds" data-i18n="delay.secs">seconds</option>
+      <option value="minutes" data-i18n="delay.mins">minutes</option>
+      <option value="hours" data-i18n="delay.hours">hours</option>
+      <option value="days" data-i18n="delay.days">days</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-attempts"><i class="fa fa-tasks"></i> <span data-i18n="common.label.attempts"></span></label>
+    <input type="text" id="node-input-attempts">
+  </div>
+  <div class="form-row">
+      <input type="checkbox" id="node-input-debug" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-debug" style="width: auto"><span>Debug print?</span></label>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="Invalid Option">
+  <p>Ainda será produzido.</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('Invalid Option',{
+      category: 'sunshine',
+      name:"Invalid Option",
+      color:"#EC1717",
+      defaults: {
+          name: {value:""},
+          postmessage: {value:""},
+          timeout: {value:"0", required:true},
+          timeoutUnits: {value:"disabled"},
+          smooch:{value:"", type:"smooch"},
+          attempts: {value:"", validate:function(attempts) { return ((attempts === "") || (RED.validators.number(attempts) && (attempts >= 0) && (attempts <= 100))) }},
+          debug: {value: false}
+      },
+      inputs:1,
+      //outputs:1,
+      icon: "smooch.svg",
+      label: function() {
+        if (this.name) {
+          return this.name || "Send";
+        }
+        if(this.timeoutUnits)
+        {
+          var units = this.timeoutUnits ? this.timeoutUnits.charAt(0) : "s";
+          if (this.timeoutUnits == "milliseconds") { units = "ms"; }
+          return this._("delay.label.delay")+" "+this.timeout+units;
+        }
+      },
+      labelStyle: function() {
+          return this.name?"node_label_italic":"";
+      },
+      oneditprepare: function() {
+          var node = this;
+          $( "#node-input-timeout" ).spinner({min:1});
+          this.editor = RED.editor.createEditor({
+            id: 'node-input-postmessage',
+            mode: 'ace/mode/text',
+            value: this.postmessage,
+          });
+          if (!this.timeoutUnits) {
+              $("#node-input-timeoutUnits option").filter(function() {
+                  return $(this).val() == 'disabled';
+              }).attr('selected', true);
+          }
+        },
+      oneditsave: function() {
+
+          this.postmessage = this.editor.getValue();
+          var val = this.editor.getValue();
+          this.editor.destroy();
+          delete this.editor;
+          $("#node-input-postmessage").val(val);
+      },
+      oneditcancel: function() {
+          this.editor.destroy();
+          delete this.editor;
+      }
+  });
+</script>
+
+

@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+"use strict";
+var utils = require('./lib/helpers/utils');
 
 const { indexOf } = require('cli-color/beep');
 
@@ -294,7 +296,7 @@ module.exports = function(RED) {
 
   var request = require('request');
 
-  function sendMessage(msg, node, question, questionWhatsapp){
+  function sendMessage(dados, msg, node, question, questionWhatsapp){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
     var debug = true;//utils.extractValue('boolean', 'debug', node, msg, false);
@@ -371,7 +373,7 @@ module.exports = function(RED) {
         msgBody.text = msgBody.text.replace("{address}", msg.payload.address) || "";
     }
 
-    
+    msgBody.text = msgBody.text.textFromDataForm(dados, msg);
 
     opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
     opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
@@ -445,8 +447,12 @@ module.exports = function(RED) {
       var autosequence = n.autosequence;
       var actionbutton = n.actionbutton;
       var needsCount = repair;
-      var name = n.name.replace(" ","").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
+      var name = n.name.replace(/\s/g,"").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
       var nameOriginal = n.name;
+
+
+      //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
+      var contextQuestion = this.context().flow;
       var questionOrigem = n.question.greeting();
 
       var question;
@@ -463,8 +469,7 @@ module.exports = function(RED) {
         question = question.greeting();
       }
 
-      //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
-      var contextQuestion = this.context().flow;
+      
 
       if (this.propertyType === 'jsonata') {
           try {
@@ -681,7 +686,7 @@ module.exports = function(RED) {
                         var quest = {"nameOriginal":nameOriginal, "name": name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
                         dados.questions.push(quest);
                         //node.warn(property);
-                        sendMessage(msg, node, question, questionWhatsapp)
+                        sendMessage(contextQuestion, msg, node, question, questionWhatsapp)
                         return done();
                       }
 

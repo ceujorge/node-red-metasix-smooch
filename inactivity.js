@@ -44,11 +44,11 @@ module.exports = function(RED) {
                     
                     if(dados.count >= node.attempts)
                     {
-                        userContext.set(keys[i], undefined);
+                        //userContext.set(keys[i], undefined);
                         node.send([null, {"payload":{"appUser":{"_id":dados.id},"msg":msg}}])
                         return;
                     }
-                    node.send([{"payload":{"appUser":{"_id":dados.id}, "msg":msg}}]);
+                    node.send([{"payload":{"appUser":{"_id":dados.id}, "msg":msg}}, null]);
                 }
             }
         }
