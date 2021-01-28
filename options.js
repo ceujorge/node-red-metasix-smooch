@@ -314,7 +314,7 @@ module.exports = function(RED) {
     });
 
     // exit if empty appusers
-    if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+    if (msg.payload.appUser === undefined) {
       node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
       return;
     }
@@ -349,8 +349,6 @@ module.exports = function(RED) {
       }
     }
 
-    //node.warn(bodyMsg);
-
     var opts = {
       method: "POST",
       url: null,
@@ -372,12 +370,15 @@ module.exports = function(RED) {
     if(msg.payload.address){
         msgBody.text = msgBody.text.replace("{address}", msg.payload.address) || "";
     }
-
+    
     msgBody.text = msgBody.text.textFromDataForm(node, dados, msg);
+    //node.warn(msgBody);
 
     opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
     opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
     opts.body = msgBody;
+
+    //node.warn(opts.url);
 
     request(opts, function (error, response, body) {
       node.status({});
@@ -668,7 +669,7 @@ module.exports = function(RED) {
                   } else {
                         
                         // exit if empty appusers
-                        if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+                        if (msg.payload.appUser === undefined) {
                           node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
                           return;
                         }

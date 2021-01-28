@@ -98,7 +98,7 @@ module.exports = function (RED) {
       });
 
       // exit if empty appusers
-      if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+      if (msg.payload.appUser === undefined) {
         node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
         return;
       }
@@ -144,7 +144,7 @@ module.exports = function (RED) {
       opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
 
       msgBody.text = msgBody.text.greeting();
-      msgBody.text = msgBody.text.textFromDataForm(contextSend,msg);
+      msgBody.text = msgBody.text.textFromDataForm(node, contextSend,msg);
       
       opts.body = msgBody;
 
@@ -206,9 +206,11 @@ module.exports = function (RED) {
                       usrcontex.questions[idx].attemptsInvalid = 0
                         
                     usrcontex.questions[idx].attemptsInvalid++;
+                    usrcontex.questions[idx].fristtime = true;
 
                     if(usrcontex.questions[idx].attemptsInvalid >= attempts)
                     {
+                      
                       //contextSend.set(msgstatus, undefined);
                       node.status({
                         fill: "red",

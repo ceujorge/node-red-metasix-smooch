@@ -101,7 +101,7 @@ module.exports = function (RED) {
       });
 
       // exit if empty appusers
-      if ((msg.payload.appUser === undefined) && (msg.payload.appusers === undefined)) {
+      if (msg.payload.appUser === undefined) {
         node.warn('msg.payload.appusers or msg.payload.appUser._id are missing or null');
         return;
       }
