@@ -17,6 +17,7 @@
 var utils = require('./lib/helpers/utils');
 
 const { indexOf } = require('cli-color/beep');
+const { value } = require('pb-util/build');
 
 module.exports = function(RED) {
   "use strict";
@@ -120,7 +121,28 @@ module.exports = function(RED) {
   function getV1(node,msg,rule,hasParts,done) {
       if (rule.vt === 'prev') {
           return done(undefined,node.previousValue);
-      } else if (rule.vt === 'jsonata') {
+      } 
+      else if (rule.vt === 'cpf') {
+        RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg, function(err,value) {
+            if (err) {
+                return done(undefined, undefined);
+            } else {
+                //node.warn("valor: "+testaCPF(value))
+                return done(undefined, testaCPF(value))
+            }
+        });
+      }
+      else if (rule.vt === 'cnpj') {
+        RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg, function(err,value) {
+            if (err) {
+                return done(undefined, undefined);
+            } else {
+                //node.warn("valor1: "+testaCNPJ(value))
+                return done(undefined, testaCNPJ(value));
+            }
+        });
+      }
+      else if (rule.vt === 'jsonata') {
           var exp = rule.v;
           if (rule.t === 'jsonata_exp') {
               if (hasParts) {
@@ -154,7 +176,16 @@ module.exports = function(RED) {
       var v2 = rule.v2;
       if (rule.v2t === 'prev') {
           return done(undefined,node.previousValue);
-      } else if (rule.v2t === 'jsonata') {
+      }
+      else if (rule.v2t === 'cpf') {
+        node.warn("v2: "+v2);
+        return done(undefined,true);
+      }
+      else if (rule.v2t === 'cnpj') {
+        node.warn("v2: "+v2);
+        return done(undefined,true);
+      } 
+      else if (rule.v2t === 'jsonata') {
           RED.util.evaluateJSONataExpression(rule.v2,msg,(err,value) => {
               if (err) {
                   done(RED._("switch.errors.invalid-expr",{error:err.message}));
@@ -232,6 +263,80 @@ module.exports = function(RED) {
           }
       });
   }
+    function testaCPF(strCPF) {
+        var Soma;
+        var Resto;
+        Soma = 0;
+    if (strCPF == "00000000000") return undefined;
+        
+    for (var i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+    Resto = (Soma * 10) % 11;
+
+        if ((Resto == 10) || (Resto == 11))  Resto = 0;
+        if (Resto != parseInt(strCPF.substring(9, 10)) ) return undefined;
+
+    Soma = 0;
+        for (var i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+        Resto = (Soma * 10) % 11;
+
+        if ((Resto == 10) || (Resto == 11))  Resto = 0;
+        if (Resto != parseInt(strCPF.substring(10, 11) ) ) return undefined;
+        //se valido retorna o proprio CPF
+        return strCPF;
+    }
+
+    function testaCNPJ(cnpj) {
+ 
+        cnpj = cnpj.replace(/[^\d]+/g,'');
+     
+        if(cnpj == '') return undefined;
+         
+        if (cnpj.length != 14)
+            return undefined;
+     
+        // Elimina CNPJs invalidos conhecidos
+        if (cnpj == "00000000000000" || 
+            cnpj == "11111111111111" || 
+            cnpj == "22222222222222" || 
+            cnpj == "33333333333333" || 
+            cnpj == "44444444444444" || 
+            cnpj == "55555555555555" || 
+            cnpj == "66666666666666" || 
+            cnpj == "77777777777777" || 
+            cnpj == "88888888888888" || 
+            cnpj == "99999999999999")
+            return undefined;
+             
+        // Valida DVs
+        var tamanho = cnpj.length - 2
+        var numeros = cnpj.substring(0,tamanho);
+        var digitos = cnpj.substring(tamanho);
+        var soma = 0;
+        var pos = tamanho - 7;
+        for (var i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2)
+                pos = 9;
+        }
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(0))
+            return undefined;
+             
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0,tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        for (i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2)
+                pos = 9;
+        }
+        var resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(1))
+              return undefined;
+               
+        return cnpj;
+    }
 
   function searchObject(arraySearch, attribute, velue){
     return arraySearch.filter(function (el) {

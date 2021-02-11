@@ -628,6 +628,8 @@
             "repair": "recreate message sequences"
         },
         "previous": "previous value",
+        "cpf": "valida CPF",
+        "cnpj": "valida CNPJ",
         "and": "and",
         "checkall": "checking all rules",
         "stopfirst": "stopping after first match",

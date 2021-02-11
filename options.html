@@ -182,6 +182,8 @@
       oneditprepare: function() {
           var node = this;
           var previousValueType = {value:"prev",label:this._("switch.previous"),hasValue:false};
+          var cpfValueType = {value:"cpf",label:this._("switch.cpf"),hasValue:false};
+          var cnpjValueType = {value:"cnpj",label:this._("switch.cnpj"),hasValue:false};
 
           $("#node-input-property").typedInput({default:this.propertyType||'msg',types:['msg','flow','global','jsonata','env']});
           var outputCount = $("#node-input-outputs").val("{}");
@@ -360,10 +362,10 @@
                   }
 
                   function createValueField(){
-                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['flow','global','str','num',previousValueType]});
+                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['flow','global','str','num', previousValueType, cpfValueType, cnpjValueType]});
                   }
                   function createValueField1(){
-                      return $('<input/>',{class:"node-input-rule-ret",type:"text", style:"margin-left: 5px;"}).appendTo(row1).typedInput({default:'str',types:['flow','global','str','num',previousValueType]});;
+                      return $('<input/>',{class:"node-input-rule-ret",type:"text", style:"margin-left: 5px;"}).appendTo(row1).typedInput({default:'str',types:['flow','global','str','num',previousValueType, cpfValueType, cnpjValueType]});;
                   }
 
                   function createNumValueField(){
