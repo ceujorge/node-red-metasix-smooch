@@ -264,6 +264,7 @@ module.exports = function(RED) {
       });
   }
     function testaCPF(strCPF) {
+        strCPF = strCPF.replace(/[^\d]+/g,'');
         var Soma;
         var Resto;
         Soma = 0;
