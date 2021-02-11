@@ -16,6 +16,10 @@
       <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
       <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
   </div>
+  <div class="form-row">
+    <label for="node-input-avatar"><i class="fa fa-user-circle-o"></i> <span data-i18n="common.label.avatar">Avatar</span></label>
+    <input type="text" id="node-input-avatar">
+  </div>
 
   <div class="form-row">
     <ul style="min-width: 600px; margin-bottom: 20px;" id="func-tabs"></ul>
@@ -134,9 +138,10 @@
       category: 'sunshine',
       defaults: {
           name: {value:""},
+          avatar:{value:null},
           question: {value:""},
           smooch:{value:"", type:"smooch"},
-          property: {value:"payload", required:true, validate: RED.validators.typedInput("propertyType")},
+          property: {value:"payload.messages[0].text", required:true, validate: RED.validators.typedInput("propertyType")},
           propertyType: { value:"msg" },
           rules: {value:[{t:"eq", v:"", vt:"str", ret:""}]},
           checkall: {value:"true", required:true},
@@ -355,10 +360,10 @@
                   }
 
                   function createValueField(){
-                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['flow','global','str','num']});
+                      return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['flow','global','str','num',previousValueType]});
                   }
                   function createValueField1(){
-                      return $('<input/>',{class:"node-input-rule-ret",type:"text", style:"margin-left: 5px;"}).appendTo(row1).typedInput({default:'str',types:['flow','global','str','num']});;
+                      return $('<input/>',{class:"node-input-rule-ret",type:"text", style:"margin-left: 5px;"}).appendTo(row1).typedInput({default:'str',types:['flow','global','str','num',previousValueType]});;
                   }
 
                   function createNumValueField(){

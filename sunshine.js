@@ -56,6 +56,7 @@ module.exports = function (RED) {
     node.clearuser = config.clearuser;
     node.timeoutUnits = config.timeoutUnits;
     node.postmessage = config.postmessage;
+    node.avatar = config.avatar;
   
     node.idList = [];
 
@@ -85,6 +86,7 @@ module.exports = function (RED) {
       var returnquestion = utils.extractValue('boolean', 'returnquestion', node, msg, false);
       var clearuser = utils.extractValue('boolean', 'clearuser', node, msg, false);
       var valuemsg = utils.extractValue('string', 'postmessage', node, msg, false);
+      var avatar = utils.extractValue('string', 'avatar', node, msg, true);
       
 
       // exit if empty credentials
@@ -115,7 +117,7 @@ module.exports = function (RED) {
       if ((msg.payload.msgBody === undefined) || (msg.payload.msgBody === null) ) {
         if(valuemsg != null)
         {
-          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text"};
+          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text", "avatarUrl":avatar};
         }
         else
         {

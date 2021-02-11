@@ -16,11 +16,15 @@
       <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
+      <label for="node-input-avatar"><i class="fa fa-user-circle-o"></i> <span data-i18n="common.label.avatar">Avatar</span></label>
+      <input type="text" id="node-input-avatar">
+  </div>
+  <div class="form-row">
       <label for="node-input-smooch"><i class="fa fa-globe"></i> <span>Provider</span></label>
       <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
   </div>
   <div class="form-row">
-    <label for="node-input-postmessage"><i class="fa fa-tag"></i> <span data-i18n="common.label.postmessage">Message</span></label>
+    <label for="node-input-postmessage"><i class="fa fa-newspaper-o"></i> <span data-i18n="common.label.postmessage">Message</span></label>
     <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-postmessage"></div>
   </div>
   <div class="form-row" id="delay-details-for">
@@ -76,6 +80,7 @@
       color:"#DEB887",
       defaults: {
           name: {value:""},
+          avatar:{value:null},
           postmessage: {value:""},
           timeout: {value:"0", required:true},
           timeoutUnits: {value:"disabled"},

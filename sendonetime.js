@@ -56,6 +56,7 @@ module.exports = function (RED) {
     node.clearuser = config.clearuser;
     node.timeoutUnits = config.timeoutUnits;
     node.postmessage = config.postmessage;
+    node.avatar = config.avatar;
   
     node.idList = [];
 
@@ -74,8 +75,6 @@ module.exports = function (RED) {
       node.timeout = 0;//parseInt(config.timeout) * 1000;
     }
 
-    //node.timeout = config.timeout;
-
     //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
     var contextSend = this.context().flow;
     
@@ -86,6 +85,7 @@ module.exports = function (RED) {
       var clearuser = utils.extractValue('boolean', 'clearuser', node, msg, false);
       var valuemsg = utils.extractValue('string', 'postmessage', node, msg, false);
       var name = utils.extractValue('string', 'name', node, msg, false);
+      var avatar = utils.extractValue('string', 'avatar', node, msg, true);
 
       name = name.replace(" ","").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
       
@@ -118,7 +118,7 @@ module.exports = function (RED) {
       if ((msg.payload.msgBody === undefined) || (msg.payload.msgBody === null) ) {
         if(valuemsg != null)
         {
-          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text"};
+          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text", "avatarUrl":avatar};
         }
         else
         {

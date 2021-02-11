@@ -19,7 +19,7 @@
         appid: {value:"", required:false}
       },
       credentials: {
-          host: {value:"localhost",required:true},
+          host: {value:"https://api.smooch.io/v1.1",required:true},
           username: {value:"",required:true},
           password: {type:"password" ,value:"",required:true},
       },
@@ -35,19 +35,19 @@
       <input type="text" id="node-config-input-name" placeholder="Name Server">
   </div>
   <div class="form-row">
-      <label for="node-config-input-appid"><i class="fa fa-tag"></i> <span data-i18n="common.label.name">App Id</span></label>
+      <label for="node-config-input-appid"><i class="fa fa-tag"></i> <span data-i18n="common.label.appid">App Id</span></label>
       <input type="text" id="node-config-input-appid">
   </div>
   <div class="form-row">
-    <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+    <label for="node-config-input-host"><i class="fa fa-external-link"></i>Host</label>
     <input type="text" id="node-config-input-host" placeholder="Url server provider">
 </div>
   <div class="form-row">
-      <label for="node-config-input-username"><i class="fa fa-bookmark"></i> Username</label>
+      <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
       <input type="text" id="node-config-input-username" placeholder="Username">
   </div>
   <div class="form-row">
-    <label for="node-config-input-password"><i class="fa fa-bookmark"></i> Password</label>
+    <label for="node-config-input-password"><i class="fa fa-unlock"></i> Password</label>
     <input type="text" id="node-config-input-password" placeholder="Password">
 </div>
 </script>
@@ -58,11 +58,15 @@
       <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
+      <label for="node-input-avatar"><i class="fa fa-user-circle-o"></i> <span data-i18n="common.label.avatar">Avatar</span></label>
+      <input type="text" id="node-input-avatar">
+  </div>
+  <div class="form-row">
       <label for="node-input-smooch"><i class="fa fa-globe"></i> <span>Provider</span></label>
       <input type="text" id="node-input-smooch" placeholder="Server provider sunshine">
   </div>
   <div class="form-row">
-    <label for="node-input-postmessage"><i class="fa fa-tag"></i> <span data-i18n="common.label.postmessage">Message</span></label>
+    <label for="node-input-postmessage"><i class="fa fa-newspaper-o"></i> <span data-i18n="common.label.postmessage">Message</span></label>
     <div style="height: 150px; min-height:50px;" class="node-text-editor" id="node-input-postmessage"></div>
   </div>
   <div class="form-row" id="delay-details-for">
@@ -124,6 +128,7 @@
       color:"#DEB887",
       defaults: {
           name: {value:""},
+          avatar:{value:null},
           postmessage: {value:""},
           timeout: {value:"0", required:true},
           timeoutUnits: {value:"disabled"},

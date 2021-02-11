@@ -248,18 +248,37 @@ module.exports = function(RED) {
     return newDescription;
   }
 
-  function compositionQuestionButton (value, description, autosequence){
+  function compositionQuestionButton (useretvalue, value, description, autosequence){
     var buttons = [];
     var dataActions;
     var payload;
 
-    for (var i=0; i<value.length; i++) {
-      if(value[i].ret !== undefined)
-      { 
-         dataActions = (autosequence)?`${i+1 + " - " + value[i].ret}`:`${value[i].ret}`;
-         payload = value[i].v;
-         buttons.push({"type": 'reply', "text": dataActions, "payload": payload});
-      }
+    var sub = description.match(/(?<={{btn:)(.*)(?=}})/igm);
+    var payloadSub = null;
+    var payloadNew = null;
+    var textNew = null;
+    if(sub)
+    {
+        for (var i=0; i < sub.length; i++)
+        {
+            description = description.replace("{{btn:"+sub[i]+"}}","");
+            payloadSub = sub[i].match(/(#[0-9]?[0-9])/);
+            textNew = sub[i].replace("#","");
+            payloadNew = (payloadSub)?payloadSub[0].replace("#",""):textNew
+            buttons.push({"type": 'reply', "text": textNew, "payload": payloadNew});
+        }
+    }
+
+    if(useretvalue)
+    {
+        for (var i=0; i<value.length; i++) {
+        if(value[i].ret !== undefined)
+        { 
+            dataActions = (autosequence)?`${i+1 + " - " + value[i].ret}`:`${value[i].ret}`;
+            payload = value[i].v;
+            buttons.push({"type": 'reply', "text": dataActions, "payload": payload});
+        }
+        }
     }
 
     return {
@@ -296,7 +315,7 @@ module.exports = function(RED) {
 
   var request = require('request');
 
-  function sendMessage(debug, dados, msg, node, question, questionWhatsapp){
+  function sendMessage(avatar, debug, dados, msg, node, question, questionWhatsapp){
 
     var smoochNode = RED.nodes.getNode(node.smooch);
 
@@ -348,6 +367,8 @@ module.exports = function(RED) {
         return;
       }
     }
+
+    bodyMsg.avatarUrl = avatar;
 
     var opts = {
       method: "POST",
@@ -437,6 +458,7 @@ module.exports = function(RED) {
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
       this.name = n.name;
+      this.avatar = n.avatar;
       this.actionbutton = n.actionbutton;
 
       this.question = n.question;
@@ -452,6 +474,7 @@ module.exports = function(RED) {
       var needsCount = repair;
       var name = n.name.replace(/\s/g,"").toLowerCase().normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, "");
       var nameOriginal = n.name;
+      var avatar = n.avatar;
 
 
       //Objeto de contexto usado para grava a questão respondida no contexto do fluxo para a sessão criada atravez do appuserid
@@ -462,7 +485,8 @@ module.exports = function(RED) {
       var questionWhatsapp;
       if(actionbutton)
       {
-        question = compositionQuestionButton(this.rules,n.question,autosequence);
+        question = compositionQuestionButton(useretvalue,this.rules,n.question,autosequence);
+        //node.warn(question)
         questionWhatsapp = (useretvalue)?compositionQuestion(this.rules,n.question,autosequence):n.question;
         questionWhatsapp = questionWhatsapp.greeting();
       }
@@ -689,7 +713,7 @@ module.exports = function(RED) {
                         var quest = {"nameOriginal":nameOriginal, name: name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
                         dados.questions.push(quest);
                         //node.warn(property);
-                        sendMessage(debug, contextQuestion, msg, node, question, questionWhatsapp)
+                        sendMessage(avatar, debug, contextQuestion, msg, node, question, questionWhatsapp)
                         return done();
                       }
 

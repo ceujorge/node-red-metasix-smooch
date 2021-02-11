@@ -42,7 +42,7 @@ module.exports = function (RED) {
       if(!contextSend.get(user_key))
       {
         node.warn("Context flow user dos not exist!!!");
-        return;
+        //return;
       }
 
       var userContext = contextSend.get(user_key);
@@ -69,8 +69,10 @@ module.exports = function (RED) {
 
       // Train and save the model.
       (async() => {
+          node.warn(manager);
           await manager.train();
           manager.save();
+          node.warn(manager);
           const response = await manager.process('pt', msg.payload.messages[0].text);
           node.send(response);
       })();

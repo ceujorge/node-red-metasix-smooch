@@ -1,6 +1,6 @@
 {
   "name": "red-contrib-sunshine-conversation",
-  "version": "0.1.33",
+  "version": "0.1.35",
   "description": "Send mensage using sunshine conversation API",
   "dependencies": {
     "axios": "^0.21.1",
@@ -19,7 +19,8 @@
     "pb-util": "^0.1.0",
     "prettyjson": "^1.2.1",
     "request": "^2.88.0",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "sentiment-ptbr": "~1.0.3"
   },
   "keywords": [
     "node-red",
@@ -42,7 +43,8 @@
       "sendonetime": "sendonetime.js",
       "checkaddress": "checkaddress.js",
       "backto": "backto.js",
-      "invalidoption": "invalidoption.js"
+      "invalidoption": "invalidoption.js",
+      "sentimentverify": "sentimentverify.js"
     }
   },
   "directories": {
