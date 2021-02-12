@@ -112,7 +112,6 @@
       {v:"jsonata_exp",t:"switch.rules.exp",kind:'O'},
       {v:"else",t:"switch.rules.else",kind:'O'}
   ];
-
   function clipValueLength(v) {
       if (v.length > 15) {
           return v.substring(0,15)+"...";
@@ -411,15 +410,11 @@
                   var btwnValue2Field = null;
                   var typeValueField = null;
 
-                  //<label for="node-input-question"><span data-i18n="common.label.question">Question</span></label>
-
                   var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
                   finalspan.append(' &#8594; <span class="node-input-rule-index">'+(i+1)+'</span> ');
 
-
                   var labelRet = $('<span/>',{class:"node-input-rule-labelret",style:"float: right;margin-top: 6px;"}).appendTo(row1)
                   labelRet.append(' &#8594; <span class="node-input-rule-labelret"> Out </span> ');
-
 
                   var caseSensitive = $('<input/>',{id:"node-input-rule-case-"+i,class:"node-input-rule-case",type:"checkbox",style:"width:auto;vertical-align:top"}).appendTo(row2);
                   $('<label/>',{for:"node-input-rule-case-"+i,style:"margin-left: 3px;"}).text(caseLabel).appendTo(row2);
