@@ -272,24 +272,36 @@ module.exports = function(RED) {
         var Soma;
         var Resto;
         Soma = 0;
+        // Elimina CPFs invalidos conhecidos
+        if (strCPF == "00000000000000" || 
+        strCPF == "11111111111111" || 
+        strCPF == "22222222222222" || 
+        strCPF == "33333333333333" || 
+        strCPF == "44444444444444" || 
+        strCPF == "55555555555555" || 
+        strCPF == "66666666666666" || 
+        strCPF == "77777777777777" || 
+        strCPF == "88888888888888" || 
+        strCPF == "99999999999999")
+        return undefined;
 
-    const sequencia = strCPF[0].repeat(strCPF.length);
-    if (strCPF === sequencia) return undefined;
-        
-    for (var i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-    Resto = (Soma * 10) % 11;
-
-        if ((Resto == 10) || (Resto == 11))  Resto = 0;
-        if (Resto != parseInt(strCPF.substring(9, 10)) ) return undefined;
-
-    Soma = 0;
-        for (var i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+        const sequencia = strCPF[0].repeat(strCPF.length);
+        if (strCPF === sequencia) return undefined;
+            
+        for (var i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
         Resto = (Soma * 10) % 11;
 
-        if ((Resto == 10) || (Resto == 11))  Resto = 0;
-        if (Resto != parseInt(strCPF.substring(10, 11) ) ) return undefined;
-        //se valido retorna o proprio CPF
-        return original;
+            if ((Resto == 10) || (Resto == 11))  Resto = 0;
+            if (Resto != parseInt(strCPF.substring(9, 10)) ) return undefined;
+
+        Soma = 0;
+            for (var i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+            Resto = (Soma * 10) % 11;
+
+            if ((Resto == 10) || (Resto == 11))  Resto = 0;
+            if (Resto != parseInt(strCPF.substring(10, 11) ) ) return undefined;
+            //se valido retorna o proprio CPF
+            return original;
     }
 
     function testaCNPJ(cnpj) {
@@ -303,8 +315,19 @@ module.exports = function(RED) {
             return undefined;
      
         // Elimina CNPJs invalidos conhecidos
-        const sequencia = cnpj[0].repeat(cnpj.length);
-        if (cnpj === sequencia) return undefined;
+        if (cnpj == "00000000000000" || 
+        cnpj == "11111111111111" || 
+        cnpj == "22222222222222" || 
+        cnpj == "33333333333333" || 
+        cnpj == "44444444444444" || 
+        cnpj == "55555555555555" || 
+        cnpj == "66666666666666" || 
+        cnpj == "77777777777777" || 
+        cnpj == "88888888888888" || 
+        cnpj == "99999999999999")
+        return undefined;
+        //const sequencia = cnpj[0].repeat(cnpj.length);
+        //if (cnpj === sequencia) return undefined;
              
         // Valida DVs
         var tamanho = cnpj.length - 2
