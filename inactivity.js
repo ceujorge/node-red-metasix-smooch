@@ -33,22 +33,25 @@ module.exports = function(RED) {
             if(keys[i].indexOf("user-")!= -1)
             {
                 dados = userContext.get(keys[i]);
-                minutes = (parseInt((Math.abs(dados.lasttime) - today.getTime()) / (1000 * 60) % 60)*-1);
-                
-                if(minutes >= 1)
+                if(!dados.falando)
                 {
-                    if(!dados.count)
-                        dados.count = 0
-                        
-                    dados.count++;
-                    
-                    if(dados.count >= node.attempts)
+                    minutes = (parseInt((Math.abs(dados.lasttime) - today.getTime()) / (1000 * 60) % 60)*-1);
+                
+                    if(minutes >= 1)
                     {
-                        //userContext.set(keys[i], undefined);
-                        node.send([null, {"payload":{"appUser":{"_id":dados.id},"msg":msg}}])
-                        return;
+                        if(!dados.count)
+                            dados.count = 0
+                            
+                        dados.count++;
+                        
+                        if(dados.count >= node.attempts)
+                        {
+                            //userContext.set(keys[i], undefined);
+                            node.send([null, {"payload":{"appUser":{"_id":dados.id},"msg":msg}}])
+                            return;
+                        }
+                        node.send([{"payload":{"appUser":{"_id":dados.id}, "msg":msg}}, null]);
                     }
-                    node.send([{"payload":{"appUser":{"_id":dados.id}, "msg":msg}}, null]);
                 }
             }
         }

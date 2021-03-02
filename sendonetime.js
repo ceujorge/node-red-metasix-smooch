@@ -118,7 +118,7 @@ module.exports = function (RED) {
       if ((msg.payload.msgBody === undefined) || (msg.payload.msgBody === null) ) {
         if(valuemsg != null)
         {
-          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text", "avatarUrl":avatar};
+          bodyMsg = {"text":valuemsg, "role":"appMaker", "type": "text", "avatarUrl":avatar || ""};
         }
         else
         {
@@ -149,9 +149,13 @@ module.exports = function (RED) {
       opts.url = host + "/apps/" + apps + "/appusers/" + appusers + "/messages";
       opts.headers = {"authorization": auth,"content-type": "application/json",accept:"application/json, text/plain;q=0.9, */*;q=0.8"};
 
+      
+
       msgBody.text = msgBody.text.greeting();
       msgBody.text = msgBody.text.textFromDataForm(node, contextSend, msg);
       opts.body = msgBody;
+
+      node.warn(opts)
 
       var msgstatus = "user-"+appusers;
       if(contextSend.get(msgstatus))
@@ -159,7 +163,7 @@ module.exports = function (RED) {
         var usrcontex = contextSend.get(msgstatus);
         if(usrcontex.onetimenode){
           var idx = usrcontex.onetimenode.findIndex(x => x.name === name);
-          //node.warn(idx);
+          node.warn(idx);
           if(idx > -1)
           {
             if(usrcontex.onetimenode[idx].fristtime)

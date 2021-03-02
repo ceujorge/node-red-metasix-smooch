@@ -53,7 +53,7 @@ module.exports = function (RED) {
 
         for (var i=0; i<userContext.questions.length; i++)
         {
-          if(userContext.questions[i].original !== null )
+          if(userContext.questions[i].original !== null  || userContext.questions[i].skipbread === false)
           {
             for (var y=0; y<userContext.questions[i].original.length; y++)
             {

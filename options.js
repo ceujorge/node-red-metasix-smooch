@@ -125,9 +125,10 @@ module.exports = function(RED) {
       else if (rule.vt === 'cpf') {
         RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg, function(err,value) {
             if (err) {
+                node.warn("erro: "+testaCPF(value))
                 return done(undefined, undefined);
             } else {
-                //node.warn("valor: "+testaCPF(value))
+                node.warn("ok: "+testaCPF(value))
                 return done(undefined, testaCPF(value))
             }
         });
@@ -135,9 +136,10 @@ module.exports = function(RED) {
       else if (rule.vt === 'cnpj') {
         RED.util.evaluateNodeProperty(node.property,node.propertyType,node,msg, function(err,value) {
             if (err) {
+                node.warn("erroCpnj: "+testaCNPJ(value))
                 return done(undefined, undefined);
             } else {
-                //node.warn("valor1: "+testaCNPJ(value))
+                node.warn("okCpnj: "+testaCNPJ(value))
                 return done(undefined, testaCNPJ(value));
             }
         });
@@ -179,11 +181,11 @@ module.exports = function(RED) {
       }
       else if (rule.v2t === 'cpf') {
         node.warn("v2: "+v2);
-        return done(undefined,true);
+        return done(undefined,testaCPF(v2));
       }
       else if (rule.v2t === 'cnpj') {
         node.warn("v2: "+v2);
-        return done(undefined,true);
+        return done(undefined,testaCNPJ(v2));
       } 
       else if (rule.v2t === 'jsonata') {
           RED.util.evaluateJSONataExpression(rule.v2,msg,(err,value) => {
@@ -264,11 +266,15 @@ module.exports = function(RED) {
       });
   }
     function testaCPF(strCPF) {
-        strCPF = strCPF.replace(/[^\d]+/g,'');
+        var original = strCPF;
+        strCPF = strCPF.replace(/[^\d]+/g,"");
+
         var Soma;
         var Resto;
         Soma = 0;
-    if (strCPF == "00000000000") return undefined;
+
+    const sequencia = strCPF[0].repeat(strCPF.length);
+    if (strCPF === sequencia) return undefined;
         
     for (var i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
     Resto = (Soma * 10) % 11;
@@ -283,12 +289,13 @@ module.exports = function(RED) {
         if ((Resto == 10) || (Resto == 11))  Resto = 0;
         if (Resto != parseInt(strCPF.substring(10, 11) ) ) return undefined;
         //se valido retorna o proprio CPF
-        return strCPF;
+        return original;
     }
 
     function testaCNPJ(cnpj) {
- 
-        cnpj = cnpj.replace(/[^\d]+/g,'');
+
+        var original = cnpj;
+        cnpj = cnpj.replace(/[^\d]+/g,"");
      
         if(cnpj == '') return undefined;
          
@@ -296,17 +303,8 @@ module.exports = function(RED) {
             return undefined;
      
         // Elimina CNPJs invalidos conhecidos
-        if (cnpj == "00000000000000" || 
-            cnpj == "11111111111111" || 
-            cnpj == "22222222222222" || 
-            cnpj == "33333333333333" || 
-            cnpj == "44444444444444" || 
-            cnpj == "55555555555555" || 
-            cnpj == "66666666666666" || 
-            cnpj == "77777777777777" || 
-            cnpj == "88888888888888" || 
-            cnpj == "99999999999999")
-            return undefined;
+        const sequencia = cnpj[0].repeat(cnpj.length);
+        if (cnpj === sequencia) return undefined;
              
         // Valida DVs
         var tamanho = cnpj.length - 2
@@ -336,7 +334,7 @@ module.exports = function(RED) {
         if (resultado != digitos.charAt(1))
               return undefined;
                
-        return cnpj;
+        return original;
     }
 
   function searchObject(arraySearch, attribute, velue){
@@ -560,6 +558,7 @@ module.exports = function(RED) {
       var node = this;
       node.smooch = n.smooch;
       this.debug = n.debug;
+      this.skipbread = n.skipbread;
       this.rules = n.rules || [];
       this.property = n.property;
       this.propertyType = n.propertyType || "msg";
@@ -573,6 +572,7 @@ module.exports = function(RED) {
       this.previousValue = null;
       var valid = true;
       var debug = n.debug;
+      var skipbread = n.skipbread;
       var repair = n.repair;
       var useretvalue = n.useretvalue;
       var autosequence = n.autosequence;
@@ -816,7 +816,7 @@ module.exports = function(RED) {
 
                       if(!valores)
                       {
-                        var quest = {"nameOriginal":nameOriginal, name: name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true};
+                        var quest = {"nameOriginal":nameOriginal, name: name, text:questionOrigem, "dataForm":null, "original":null, "fristtime":true, "skipbread":skipbread};
                         dados.questions.push(quest);
                         //node.warn(property);
                         sendMessage(avatar, debug, contextQuestion, msg, node, question, questionWhatsapp)
