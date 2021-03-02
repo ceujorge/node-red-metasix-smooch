@@ -52,7 +52,10 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "Install": "npm install",
+    "Init": "npm init",
+    "Publish": "npm publish",
+    "Build": "npm build"
   },
   "author": "Cleiton Jorge (ceujorge)",
   "license": "GPL-2.0-only",
